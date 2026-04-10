@@ -2,67 +2,83 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-
-<!-- iPhone full -->
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/616/616408.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Wislist của Bòi Bói Boi🫃🏻</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500&family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
 
 <style>
 body{
   margin:0;
-  font-family:'Quicksand',sans-serif;
-  background: radial-gradient(circle at top,#2b0b12,#000);
+  font-family:'Inter',sans-serif;
+  background: radial-gradient(circle at top,#2a0a12,#000);
   color:white;
 }
 
 .header{
-  text-align:center;
-  padding:20px;
+  padding:25px 20px 10px;
   font-family:'Playfair Display';
-  font-size:22px;
-  color:#ff7b9c;
+  font-size:24px;
+  color:#ff6b9d;
 }
 
 .container{
-  max-width:500px;
+  max-width:520px;
   margin:auto;
-  padding:20px;
+  padding:15px;
 }
 
 .card{
   background:#111;
-  border-radius:22px;
-  padding:18px;
+  border-radius:20px;
+  padding:15px;
+  margin-bottom:15px;
+}
+
+.section{
+  font-size:12px;
+  color:#888;
   margin-top:10px;
 }
 
-input,select,textarea{
+input,textarea,select{
   width:100%;
-  margin-top:10px;
-  padding:14px;
-  border-radius:16px;
+  margin-top:8px;
+  padding:13px;
+  border-radius:14px;
   border:none;
   background:#1c1c1c;
   color:white;
-  font-size:16px;
+}
+
+.priority{
+  display:flex;
+  gap:6px;
+  margin-top:10px;
+}
+
+.priority div{
+  flex:1;
+  padding:10px;
+  border-radius:12px;
+  background:#222;
+  text-align:center;
+}
+
+.activeP{
+  background:#ff4f87;
 }
 
 button{
   width:100%;
-  margin-top:12px;
-  padding:14px;
+  margin-top:14px;
+  padding:13px;
   border:none;
-  border-radius:18px;
+  border-radius:14px;
   background:linear-gradient(90deg,#ff4f87,#ff8fb1);
   color:white;
-  font-weight:bold;
-  font-size:16px;
+  font-weight:600;
 }
 
 .item{
@@ -70,6 +86,16 @@ button{
   border-radius:18px;
   padding:14px;
   margin-top:12px;
+}
+
+.title{
+  font-weight:600;
+}
+
+.meta{
+  font-size:12px;
+  color:#aaa;
+  margin-top:3px;
 }
 
 img{
@@ -80,62 +106,23 @@ img{
 
 .actions{
   display:flex;
-  gap:5px;
-  margin-top:8px;
+  gap:6px;
+  margin-top:10px;
 }
 
 .actions button{
   flex:1;
   font-size:12px;
+  background:#222;
+}
+
+.buy{
+  background:#ff4f87 !important;
 }
 
 .done{
   opacity:0.5;
   text-decoration:line-through;
-}
-
-.progress{
-  height:6px;
-  background:#333;
-  border-radius:10px;
-  margin-top:5px;
-}
-
-.bar{
-  height:6px;
-  background:#ff4f87;
-  border-radius:10px;
-}
-
-.tabs{
-  display:flex;
-  gap:5px;
-  margin-top:10px;
-}
-
-.tab{
-  flex:1;
-  padding:8px;
-  border-radius:10px;
-  background:#222;
-  text-align:center;
-  font-size:13px;
-}
-
-.active{
-  background:#ff4f87;
-}
-
-.cat{
-  text-align:center;
-  font-size:30px;
-  animation: float 2s infinite;
-}
-
-@keyframes float{
-  0%{transform:translateY(0);}
-  50%{transform:translateY(-5px);}
-  100%{transform:translateY(0);}
 }
 </style>
 </head>
@@ -146,130 +133,123 @@ img{
 
 <div class="container">
 
-<div class="cat">🐱💖🐾</div>
-
 <div class="card">
 
-<input id="name" placeholder="🎁 Tên quà..." />
-<input id="price" placeholder="💰 Giá..." />
-<input id="image" placeholder="🖼️ Link ảnh..." />
-<input id="link" placeholder="🔗 Link sản phẩm..." />
+<div class="section">Thông tin</div>
+<input id="name">
+<input id="price">
 
+<div class="section">Hình & Link</div>
+<input id="image">
+<input id="link">
+
+<div class="section">Phân loại</div>
 <select id="category">
 <option>💖 Lãng mạn</option>
 <option>👕 Thời trang</option>
 <option>💻 Công nghệ</option>
+<option>🎁 Khác</option>
 </select>
 
-<textarea id="note" placeholder="💬 Ghi chú..."></textarea>
+<div class="section">Ghi chú</div>
+<textarea id="note"></textarea>
+
+<div class="section">Mức độ</div>
+<div class="priority">
+<div onclick="setP(this,1)">🤍</div>
+<div onclick="setP(this,2)">💗</div>
+<div onclick="setP(this,3)">💖</div>
+<div onclick="setP(this,4)">🔥</div>
+</div>
 
 <button onclick="addItem()">➕ Thêm</button>
 
 </div>
 
-<div class="tabs">
-  <div class="tab active" onclick="setFilter('all',this)">Tất cả</div>
-  <div class="tab" onclick="setFilter('want',this)">Muốn mua</div>
-  <div class="tab" onclick="setFilter('done',this)">Đã mua</div>
-</div>
-
-<div id="stats"></div>
 <div id="list"></div>
 
 </div>
 
 <script>
-let items=JSON.parse(localStorage.getItem("lvMAX"))||[];
-let filter="all";
+let items = JSON.parse(localStorage.getItem("fix")) || [];
+let priority = 1;
 
-function save(){
- localStorage.setItem("lvMAX",JSON.stringify(items));
+function get(id){
+  return document.getElementById(id);
 }
 
-function setFilter(f,el){
- filter=f;
- document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
- el.classList.add("active");
- render();
+function save(){
+  localStorage.setItem("fix", JSON.stringify(items));
+}
+
+function setP(el,p){
+  priority=p;
+  document.querySelectorAll(".priority div").forEach(x=>x.classList.remove("activeP"));
+  el.classList.add("activeP");
 }
 
 function render(){
- let list=document.getElementById("list");
- let stats=document.getElementById("stats");
+  let list=get("list");
+  list.innerHTML="";
 
- list.innerHTML="";
+  items.forEach((item,i)=>{
+    let div=document.createElement("div");
+    div.className="item";
 
- let filtered=items.filter(i=>{
-  if(filter==="all") return true;
-  if(filter==="want") return !i.done;
-  if(filter==="done") return i.done;
- });
+    div.innerHTML=`
+      <div class="${item.done?'done':''}">
+        <div class="title">${item.name}</div>
+        <div class="meta">${item.category} • ${item.price}</div>
+        <div class="meta">${item.note||""}</div>
+        ${item.image?`<img src="${item.image}">`:""}
+      </div>
 
- let doneCount=items.filter(i=>i.done).length;
- let percent=items.length?Math.round(doneCount/items.length*100):0;
+      <div class="actions">
+        <button class="buy" onclick="openLink('${item.link}')">🛒</button>
+        <button onclick="toggle(${i})">✔️</button>
+        <button onclick="del(${i})">❌</button>
+      </div>
+    `;
 
- stats.innerHTML=`💖 ${doneCount}/${items.length} (${percent}%)`;
-
- filtered.forEach((item,i)=>{
-  let div=document.createElement("div");
-  div.className="item";
-
-  div.innerHTML=`
-    <div class="${item.done?'done':''}">
-      <strong>${item.name}</strong>
-      <div>💰 ${item.price||""}</div>
-      <div>${item.note||""}</div>
-      ${item.image?`<img src="${item.image}">`:""}
-      ${item.link?`<a href="${item.link}" target="_blank">🛒 Mua</a>`:""}
-    </div>
-
-    <div class="progress">
-      <div class="bar" style="width:${item.done?100:40}%"></div>
-    </div>
-
-    <div class="actions">
-      <button onclick="toggle(${i})">✔️</button>
-      <button onclick="del(${i})">❌</button>
-    </div>
-  `;
-
-  list.appendChild(div);
- });
+    list.appendChild(div);
+  });
 }
 
 function addItem(){
- let name=nameInput.value;
- if(!name) return alert("Nhập quà 😾");
+  let name=get("name").value;
+  if(!name) return alert("Nhập quà 😾");
 
- items.push({
-  name,
-  price:priceInput.value,
-  image:imageInput.value,
-  link:linkInput.value,
-  note:noteInput.value,
-  done:false
- });
+  items.push({
+    name,
+    price:get("price").value,
+    image:get("image").value,
+    link:get("link").value,
+    category:get("category").value,
+    note:get("note").value,
+    priority,
+    done:false
+  });
 
- save();
- render();
+  save();
+  render();
 
- nameInput.value="";
- priceInput.value="";
- imageInput.value="";
- linkInput.value="";
- noteInput.value="";
+  ["name","price","image","link","note"].forEach(id=>get(id).value="");
 }
 
 function del(i){
- items.splice(i,1);
- save();
- render();
+  items.splice(i,1);
+  save();
+  render();
 }
 
 function toggle(i){
- items[i].done=!items[i].done;
- save();
- render();
+  items[i].done=!items[i].done;
+  save();
+  render();
+}
+
+function openLink(link){
+  if(link) window.open(link);
 }
 
 render();
