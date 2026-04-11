@@ -8,9 +8,8 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-        
         const firebaseConfig = {
-              apiKey: "AIzaSyAiOpChueDkBODGKessbTvHDS-YOxeSsHE",
+            apiKey: "AIzaSyAiOpChueDkBODGKessbTvHDS-YOxeSsHE",
   authDomain: "wishlist-c5669.firebaseapp.com",
   databaseURL: "https://wishlist-c5669-default-rtdb.asia-southeast1.firebasedatabase.app",
   projectId: "wishlist-c5669",
@@ -18,7 +17,7 @@
   messagingSenderId: "821194575297",
   appId: "1:821194575297:web:185b7837e6cdee4783f340",
   measurementId: "G-RHE1QBW9WX"
-        };
+};
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
@@ -78,21 +77,38 @@
             <div>
                 <p class="text-pink-300 text-[9px] font-bold mb-2 tracking-widest uppercase">Độ ưu tiên</p>
                 <div class="grid grid-cols-5 gap-1">
-                    <button onclick="selectPrio('Ước thôi', this)" class="prio-btn py-2 rounded-xl border border-[#333] bg-[#2a2a2a] text-[8px] text-gray-400 transition-all flex flex-col items-center"><span>💬</span>Ước thôi</button>
-                    <button onclick="selectPrio('Thích nha', this)" class="prio-btn py-2 rounded-xl border border-[#333] bg-[#2a2a2a] text-[8px] text-gray-400 transition-all flex flex-col items-center"><span>🌹</span>Thích nha</button>
-                    <button onclick="selectPrio('Muốn lắm', this)" class="prio-btn py-2 rounded-xl border border-pink-500 bg-[#3a2226] text-[8px] text-white transition-all flex flex-col items-center"><span>🥺</span>Muốn lắm</button>
-                    <button onclick="selectPrio('Cần rồi', this)" class="prio-btn py-2 rounded-xl border border-[#333] bg-[#2a2a2a] text-[8px] text-gray-400 transition-all flex flex-col items-center"><span>💕</span>Cần rồi</button>
-                    <button onclick="selectPrio('Phải có', this)" class="prio-btn py-2 rounded-xl border border-[#333] bg-[#2a2a2a] text-[8px] text-gray-400 transition-all flex flex-col items-center"><span>🔥</span>Phải có</button>
+                    <button onclick="selectPrio('Ước thôi', this)" class="prio-btn py-2 rounded-xl border border-[#333] bg-[#2a2a2a] text-[9px] text-gray-400 transition-all flex flex-col items-center leading-tight">
+                        <span class="text-base mb-1">💬</span>
+                        <span>Ước<br>thôi</span>
+                    </button>
+                    <button onclick="selectPrio('Thích nha', this)" class="prio-btn py-2 rounded-xl border border-[#333] bg-[#2a2a2a] text-[9px] text-gray-400 transition-all flex flex-col items-center leading-tight">
+                        <span class="text-base mb-1">🌹</span>
+                        <span>Thích<br>nha</span>
+                    </button>
+                    <button onclick="selectPrio('Muốn lắm', this)" class="prio-btn py-2 rounded-xl border border-pink-500 bg-[#3a2226] text-[9px] text-white transition-all flex flex-col items-center leading-tight">
+                        <span class="text-base mb-1">🥺</span>
+                        <span>Muốn<br>lắm</span>
+                    </button>
+                    <button onclick="selectPrio('Cần rồi', this)" class="prio-btn py-2 rounded-xl border border-[#333] bg-[#2a2a2a] text-[9px] text-gray-400 transition-all flex flex-col items-center leading-tight">
+                        <span class="text-base mb-1">💕</span>
+                        <span>Cần<br>rồi</span>
+                    </button>
+                    <button onclick="selectPrio('Phải có', this)" class="prio-btn py-2 rounded-xl border border-[#333] bg-[#2a2a2a] text-[9px] text-gray-400 transition-all flex flex-col items-center leading-tight">
+                        <span class="text-base mb-1">🔥</span>
+                        <span>Phải<br>có</span>
+                    </button>
                 </div>
             </div>
 
-            <button onclick="addGift()" class="w-full bg-pink-500 hover:bg-pink-600 py-4 rounded-full font-bold text-sm shadow-lg shadow-pink-500/20 active:scale-95 transition-all mt-2">
-                Thêm vào danh sách ước mơ ❤️
+            <button onclick="addGift()" class="w-full bg-pink-500 hover:bg-pink-600 py-4 rounded-full font-bold text-sm shadow-lg shadow-pink-500/20 active:scale-95 transition-all mt-2 uppercase tracking-wider">
+                + Thêm món ❤️
             </button>
         </div>
 
         <div class="mt-10">
-            <h2 class="text-sm font-bold text-gray-400 mb-4 border-b border-[#222] pb-2">📋 Danh sách đã lưu:</h2>
+            <h2 class="text-sm font-bold text-gray-400 mb-4 border-b border-[#222] pb-2 flex items-center gap-2">
+                <span>🧚‍♀️</span> Danh sách ước mơ
+            </h2>
             <div id="list"></div>
         </div>
     </div>
