@@ -3,71 +3,121 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Wishlist Realtime</title>
+
+<title>Wishlist Realtime 💗</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500&family=Inter:wght@300;400;600&family=Dancing+Script:wght@500&display=swap" rel="stylesheet">
 
 <style>
 body{
-  font-family: Arial;
-  background:#fff0f5;
+  margin:0;
+  font-family:'Inter',sans-serif;
+  background: radial-gradient(circle at top,#2b0b12,#000);
+  color:white;
+}
+
+.header{
   padding:20px;
+  font-family:'Playfair Display';
+  font-size:22px;
+  color:#ff6b9d;
+}
+
+.sub{
+  text-align:center;
+  font-family:'Dancing Script',cursive;
+  font-size:18px;
+  color:#ff9db8;
+  margin-top:-10px;
 }
 
 .container{
-  max-width:500px;
+  max-width:520px;
   margin:auto;
+  padding:15px;
 }
 
-h2{text-align:center}
+.card{
+  background:#111;
+  border-radius:20px;
+  padding:15px;
+  margin-bottom:15px;
+  box-shadow:0 0 25px rgba(255,0,80,0.15);
+}
 
-input,button{
+input,textarea,select{
   width:100%;
+  margin-top:8px;
   padding:12px;
-  margin:8px 0;
   border-radius:12px;
-  border:1px solid #ddd;
+  border:none;
+  background:#1c1c1c;
+  color:white;
 }
 
 button{
-  background:#ff69b4;
-  color:white;
-  font-weight:bold;
-  border:none;
-}
-
-.tags{
-  display:flex;
-  flex-wrap:wrap;
-  gap:8px;
-}
-
-.tag{
-  padding:8px 12px;
-  border-radius:20px;
-  border:1px solid #ccc;
-  cursor:pointer;
-  font-size:13px;
-}
-
-.tag.active{
-  background:#ff69b4;
-  color:white;
-}
-
-.item{
-  background:white;
+  width:100%;
+  margin-top:12px;
   padding:12px;
+  border:none;
   border-radius:12px;
-  margin-top:10px;
-  box-shadow:0 2px 6px rgba(0,0,0,0.1);
-  position:relative;
+  background:linear-gradient(90deg,#ff4f87,#ff8fb1);
+  color:white;
+  font-weight:600;
 }
 
 .priority{
-  font-size:12px;
-  opacity:0.7;
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-top:10px;
 }
 
-.delete{
+.priority div{
+  padding:8px 10px;
+  border-radius:10px;
+  background:#222;
+  font-size:12px;
+  cursor:pointer;
+}
+
+.activeP{
+  background:linear-gradient(90deg,#ff4f87,#ff8fb1);
+  box-shadow:0 0 10px rgba(255,79,135,0.6);
+}
+
+.item{
+  background:#111;
+  border-radius:18px;
+  padding:12px;
+  margin-top:10px;
+  position:relative;
+}
+
+.title{font-weight:600;}
+.meta{font-size:12px;color:#aaa;}
+.priority-tag{font-size:12px;color:#ff9db8;}
+
+.actions{
+  display:flex;
+  gap:6px;
+  margin-top:8px;
+}
+
+.actions button{
+  flex:1;
+  font-size:12px;
+  background:#222;
+}
+
+.buy{background:#ff4f87 !important;}
+
+.done{
+  opacity:0.5;
+  text-decoration:line-through;
+}
+
+.deleteX{
   position:absolute;
   right:10px;
   top:10px;
@@ -78,23 +128,41 @@ button{
 
 <body>
 
+<div class="header">🌹 Wishlist của Bòi Bói Boi</div>
+<div class="sub">Thêm món quà anh thích vào đây 💌</div>
+
 <div class="container">
 
-<h2>💗 Wishlist Realtime</h2>
+<div class="card">
 
-<input id="name" placeholder="Nhập món muốn thêm...">
+<input id="name" placeholder="🎁 Tên quà">
+<input id="price" placeholder="💰 Giá">
+<input id="link" placeholder="🔗 Link">
 
-<div class="tags">
-  <div class="tag">💭 Đang fomo</div>
-  <div class="tag">🌷 Thích nha</div>
-  <div class="tag">🥺 Muốn lắm lắm</div>
-  <div class="tag">💗 Cần rồi</div>
-  <div class="tag">🔥 Phải có</div>
+<select id="category">
+<option>💖 Lãng mạn</option>
+<option>👕 Thời trang</option>
+<option>💻 Công nghệ</option>
+</select>
+
+<textarea id="note" placeholder="💬 Ghi chú"></textarea>
+
+<div class="priority" id="priorityBox">
+  <div data="💭 Đang fomo">💭 Đang fomo</div>
+  <div data="🌷 Thích nha">🌷 Thích nha</div>
+  <div data="🥺 Muốn lắm lắm">🥺 Muốn lắm lắm</div>
+  <div data="💗 Cần rồi">💗 Cần rồi</div>
+  <div data="🔥 Phải có">🔥 Phải có</div>
 </div>
 
-<button onclick="addItem()">Thêm</button>
+<button id="addBtn">➕ Thêm</button>
 
+</div>
+
+<div class="card">
+<h3>📋 Wishlist realtime</h3>
 <div id="list"></div>
+</div>
 
 </div>
 
@@ -104,9 +172,9 @@ button{
 
 <script>
 
-// 
+// 🔥 FIREBASE CONFIG 
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig  = {
+const firebaseConfig = {
   apiKey: "AIzaSyAiOpChueDkBODGKessbTvHDS-YOxeSsHE",
   authDomain: "wishlist-c5669.firebaseapp.com",
   databaseURL: "https://wishlist-c5669-default-rtdb.asia-southeast1.firebasedatabase.app",
@@ -116,61 +184,87 @@ const firebaseConfig  = {
   appId: "1:821194575297:web:185b7837e6cdee4783f340",
   measurementId: "G-RHE1QBW9WX"
 };
+
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-let selectedTag = "";
+let priority = "💭 Đang fomo";
+const listEl = document.getElementById("list");
 
-// chọn tag
-document.querySelectorAll('.tag').forEach(tag=>{
-  tag.onclick = () => {
-    document.querySelectorAll('.tag').forEach(t=>t.classList.remove('active'));
-    tag.classList.add('active');
-    selectedTag = tag.innerText;
+// PRIORITY SELECT
+document.querySelectorAll("#priorityBox div").forEach(el=>{
+  el.onclick = ()=>{
+    priority = el.getAttribute("data");
 
-    if(navigator.vibrate){
-      navigator.vibrate(30);
-    }
+    document.querySelectorAll("#priorityBox div")
+      .forEach(x=>x.classList.remove("activeP"));
+
+    el.classList.add("activeP");
   }
 });
 
-// ➕ thêm item
-function addItem(){
-  const name = document.getElementById("name").value;
-  if(!name || !selectedTag) return;
+// ADD
+document.getElementById("addBtn").onclick = ()=>{
+  let name = document.getElementById("name").value;
+  if(!name) return alert("Nhập tên 😾");
 
   db.ref("wishlist").push({
     name,
-    priority: selectedTag
+    price:document.getElementById("price").value,
+    link:document.getElementById("link").value,
+    category:document.getElementById("category").value,
+    note:document.getElementById("note").value,
+    priority,
+    done:false
   });
 
-  document.getElementById("name").value = "";
+  ["name","price","link","note"].forEach(id=>{
+    document.getElementById(id).value="";
+  });
+
+  priority="💭 Đang fomo";
+};
+
+// DELETE
+function del(id){
+  db.ref("wishlist/"+id).remove();
 }
 
-// 🗑️ xoá
-function deleteItem(id){
-  db.ref("wishlist/" + id).remove();
+// TOGGLE DONE
+function toggle(id,val){
+  db.ref("wishlist/"+id).update({
+    done:!val
+  });
 }
 
-// 👀 realtime
-db.ref("wishlist").on("value", (snap)=>{
+// REALTIME
+db.ref("wishlist").on("value",(snap)=>{
   const data = snap.val();
-  const list = document.getElementById("list");
-
-  list.innerHTML = "";
+  listEl.innerHTML="";
 
   for(let id in data){
     const item = data[id];
 
-    const div = document.createElement("div");
-    div.className = "item";
-    div.innerHTML = `
-      <div class="delete" onclick="deleteItem('${id}')">❌</div>
-      <div>${item.name}</div>
-      <div class="priority">${item.priority}</div>
+    let div = document.createElement("div");
+    div.className="item";
+
+    div.innerHTML=`
+      <div class="deleteX" onclick="del('${id}')">❌</div>
+
+      <div class="${item.done?'done':''}">
+        <div class="title">${item.name}</div>
+        <div class="meta">${item.price} • ${item.category}</div>
+        <div class="priority-tag">${item.priority}</div>
+        <div class="meta">${item.note||""}</div>
+      </div>
+
+      <div class="actions">
+        <button class="buy" onclick="window.open('${item.link}')">🛒</button>
+        <button onclick="toggle('${id}',${item.done})">✔️</button>
+      </div>
     `;
 
-    list.prepend(div);
+    listEl.appendChild(div);
   }
 });
 
