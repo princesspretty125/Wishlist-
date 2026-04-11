@@ -1,278 +1,299 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Wishlist Bòi Bói Boi</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
-        body {
-            background-color: #0c0c0c;
-            color: white;
-            font-family: 'Inter', sans-serif;
-            -webkit-tap-highlight-color: transparent;
-            scroll-behavior: smooth;
-        }
-        .header-title {
-            color: #f472b6; 
-            font-weight: 800;
-        }
-        .header-sub {
-            color: #9ca3af;
-            font-style: italic;
-        }
-        /* Hiệu ứng nhấp nháy cho món quà mới */
-        .highlight-gift {
-            animation: pulse-border 1s infinite alternate;
-            border: 2px solid #ec4899 !important;
-            background-color: #2d161a !important;
-        }
-        @keyframes pulse-border {
-            from { transform: scale(1); box-shadow: 0 0 0px #ec4899; }
-            to { transform: scale(1.02); box-shadow: 0 0 20px #ec4899; }
-        }
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+   <title>Wishlist Bòi Bói Boi</title>
+   <script src="https://cdn.tailwindcss.com"></script>
+   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+   <style>
+       @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+       
+       body {
+           background-color: #0c0c0c;
+           color: white;
+           font-family: 'Inter', sans-serif;
+           -webkit-tap-highlight-color: transparent;
+           overflow-x: hidden;
+       }
 
-        /* Nút thêm quà với hiệu ứng SÁNG ĐÈN & NHẤP NHÁY */
-        #mainAddBtn {
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            position: relative;
-            overflow: visible;
-        }
-        
-        #mainAddBtn:active {
-            transform: scale(1.25);
-            filter: brightness(1.8);
-            box-shadow: 0 0 40px 10px rgba(236, 72, 153, 0.8), 0 0 80px 20px rgba(236, 72, 153, 0.4);
-            animation: btn-flash 0.15s infinite alternate;
-        }
+       .header-title {
+           color: #f472b6;
+           font-weight: 800;
+       }
 
-        @keyframes btn-flash {
-            from { opacity: 1; }
-            to { opacity: 0.8; filter: brightness(2.5); }
-        }
+       .header-sub {
+           color: #9ca3af;
+           font-style: italic;
+       }
 
-        .prio-btn { transition: all 0.2s ease; }
-        .custom-scrollbar::-webkit-scrollbar { display: none; }
-    </style>
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+       ::placeholder {
+           color: #6b7280 !important;
+           font-style: italic;
+           opacity: 0.8;
+       }
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyAiOpChueDkBODGKessbTvHDS-YOxeSsHE",
-            authDomain: "wishlist-c5669.firebaseapp.com",
-            databaseURL: "https://wishlist-c5669-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "wishlist-c5669",
-            storageBucket: "wishlist-c5669.firebasestorage.app",
-            messagingSenderId: "821194575297",
-            appId: "1:821194575297:web:185b7837e6cdee4783f340",
-            measurementId: "G-RHE1QBW9WX"
-        };
+       @keyframes highlight-flash {
+           0%, 100% { border-color: rgba(255,255,255,0.05); background-color: #161616; box-shadow: none; }
+           50% { border-color: #ec4899; background-color: #3a2226; box-shadow: 0 0 35px rgba(236,72,153,0.6); transform: scale(1.02); }
+       }
+       .highlight-gift {
+           animation: highlight-flash 0.6s ease-in-out 5 !important;
+           border: 2px solid #ec4899 !important;
+       }
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const giftCol = collection(db, "gifts");
-        
-        // Âm thanh thông báo kiểu iOS (Ting)
-        const iosTing = new Audio('https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3');
-        iosTing.volume = 1.0;
+       @keyframes btn-flash-glow {
+           0% { transform: scale(1); filter: brightness(1); box-shadow: 0 0 0px #ec4899; }
+           50% { transform: scale(1.15); filter: brightness(1.6); box-shadow: 0 0 50px #ec4899, 0 0 80px #f472b6; }
+           100% { transform: scale(1); filter: brightness(1); box-shadow: 0 0 0px #ec4899; }
+       }
+       .btn-clicked {
+           animation: btn-flash-glow 0.4s ease-out;
+       }
 
-        const prioScore = { 'Phải có': 5, 'Cần rồi': 4, 'Muốn lắm': 3, 'Thích nha': 2, 'Ước thôi': 1 };
+       .prio-btn { transition: all 0.2s ease; }
+       .prio-btn:active { transform: scale(1.1); }
+       .custom-scrollbar::-webkit-scrollbar { display: none; }
+   </style>
 
-        window.currentPrio = 'Muốn lắm';
-        window.selectPrio = (prio, btn) => {
-            window.currentPrio = prio;
-            document.querySelectorAll('.prio-btn').forEach(b => {
-                b.classList.remove('border-pink-500', 'bg-[#3a2226]', 'text-white');
-                b.classList.add('border-[#333]', 'bg-[#2a2a2a]', 'text-gray-400');
-            });
-            btn.classList.add('border-pink-500', 'bg-[#3a2226]', 'text-white');
-            btn.classList.remove('text-gray-400');
-        };
+   <script type="module">
+       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+       import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        window.formatCurrency = (input) => {
-            let value = input.value.replace(/\D/g, "");
-            input.value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-        };
+       const firebaseConfig = {
+           apiKey: "AIzaSyAiOpChueDkBODGKessbTvHDS-YOxeSsHE",
+           authDomain: "wishlist-c5669.firebaseapp.com",
+           databaseURL: "https://wishlist-c5669-default-rtdb.asia-southeast1.firebasedatabase.app",
+           projectId: "wishlist-c5669",
+           storageBucket: "wishlist-c5669.firebasestorage.app",
+           messagingSenderId: "821194575297",
+           appId: "1:821194575297:web:185b7837e6cdee4783f340",
+           measurementId: "G-RHE1QBW9WX"
+       };
 
-        const fireGiftStorm = () => {
-            const scalar = 4;
-            const gift = confetti.shapeFromText({ text: '🎁', scalar });
-            confetti({
-                particleCount: 50,
-                spread: 90,
-                origin: { y: 0.7 },
-                shapes: [gift],
-                scalar,
-                colors: ['#f472b6', '#ec4899', '#ffffff']
-            });
-        };
+       const app = initializeApp(firebaseConfig);
+       const db = getFirestore(app);
+       const giftCol = collection(db, "gifts");
+       
+       const iosTing = new Audio('https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3');
+       const clickSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3');
+       iosTing.load();
 
-        window.addGift = async () => {
-            const nameInput = document.getElementById('gName');
-            const priceInput = document.getElementById('gPrice');
-            const cateInput = document.getElementById('gCate');
-            const linkInput = document.getElementById('gLink');
-            const noteInput = document.getElementById('gNote');
+       const prioScore = { 'Phải có': 5, 'Cần rồi': 4, 'Muốn lắm': 3, 'Thích nha': 2, 'Ước thôi': 1 };
 
-            if(!nameInput.value || !priceInput.value) return;
-            
-            try {
-                const docRef = await addDoc(giftCol, { 
-                    name: nameInput.value, 
-                    cate: cateInput.value, 
-                    price: priceInput.value.replace(/,/g, ""), 
-                    link: linkInput.value, 
-                    note: noteInput.value, 
-                    prio: window.currentPrio, 
-                    bought: false,
-                    date: new Date() 
-                });
-                
-                // Chạy hiệu ứng âm thanh & hộp quà
-                iosTing.play().catch(() => {});
-                fireGiftStorm();
-                
-                // Reset Form ngay lập tức
-                nameInput.value = ''; priceInput.value = ''; linkInput.value = ''; noteInput.value = '';
-                
-                // Scroll xuống món quà mới và highlight
-                setTimeout(() => {
-                    const el = document.getElementById(`item-${docRef.id}`);
-                    if(el) {
-                        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        el.classList.add('highlight-gift');
-                        setTimeout(() => el.classList.remove('highlight-gift'), 4000);
-                    }
-                }, 600);
-            } catch (e) { console.error(e); }
-        };
+       window.currentPrio = 'Muốn lắm';
+       window.selectPrio = (prio, btn) => {
+           clickSound.currentTime = 0;
+           clickSound.play().catch(() => {});
+           window.currentPrio = prio;
+           document.querySelectorAll('.prio-btn').forEach(b => {
+               b.classList.remove('border-pink-500', 'bg-[#3a2226]', 'text-white');
+               b.classList.add('border-[#333]', 'bg-[#2a2a2a]', 'text-gray-400');
+           });
+           btn.classList.add('border-pink-500', 'bg-[#3a2226]', 'text-white');
+           btn.classList.remove('text-gray-400');
+       };
 
-        window.toggleBought = async (id, status) => {
-            await updateDoc(doc(db, "gifts", id), { bought: !status });
-        };
+       window.formatCurrency = (input) => {
+           let value = input.value.replace(/\D/g, "");
+           input.value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+       };
 
-        window.deleteGift = async (id) => {
-            if(confirm("Xóa món này hả?")) {
-                await deleteDoc(doc(db, "gifts", id));
-            }
-        };
+       const explosionEffect = () => {
+           const scalar = 4;
+           const gift = confetti.shapeFromText({ text: '🎁', scalar });
+           
+           confetti({
+               particleCount: 50,
+               spread: 120,
+               origin: { y: 0.5 },
+               shapes: [gift],
+               scalar,
+               ticks: 300
+           });
 
-        onSnapshot(query(giftCol, orderBy("date", "desc")), (s) => {
-            const div = document.getElementById('list');
-            div.innerHTML = '';
-            let items = [];
-            s.forEach(d => items.push({ id: d.id, ...d.data() }));
-            
-            items.sort((a, b) => (prioScore[b.prio] || 0) - (prioScore[a.prio] || 0));
-            
-            items.forEach(i => {
-                const linkHTML = i.link ? `<a href="${i.link}" target="_blank" class="text-pink-400 text-[10px] underline block mt-2 font-bold uppercase tracking-wider">🔗 Link mua quà nè</a>` : '';
-                const noteHTML = i.note ? `<div class="text-[10px] text-gray-400 mt-2 italic bg-black/40 p-2 rounded-lg border border-white/5">Note: ${i.note}</div>` : '';
-                div.innerHTML += `
-                <div id="item-${i.id}" class="bg-[#161616] p-5 rounded-[25px] mb-4 border ${i.bought ? 'border-green-900/50 opacity-40' : 'border-white/5'} transition-all duration-500 shadow-xl">
-                    <div class="flex justify-between items-start">
-                        <div class="flex-1 pr-4">
-                            <div class="font-bold text-sm ${i.bought ? 'line-through text-gray-500' : 'text-white'}">${i.name}</div>
-                            <div class="flex gap-2 mt-2">
-                                <span class="text-[9px] bg-[#222] px-2 py-0.5 rounded text-gray-400 uppercase font-bold tracking-tighter">${i.cate}</span>
-                                <span class="text-[9px] text-pink-400 font-bold uppercase tracking-tighter">Ưu tiên: ${i.prio}</span>
-                            </div>
-                            ${noteHTML}
-                            ${linkHTML}
-                        </div>
-                        <div class="text-right text-yellow-500 font-bold text-sm">${Number(i.price).toLocaleString()}đ</div>
-                    </div>
-                    <div class="flex justify-end gap-5 mt-4 pt-4 border-t border-white/5">
-                        <button onclick="toggleBought('${i.id}', ${i.bought})" class="text-[10px] font-bold ${i.bought ? 'text-gray-500' : 'text-green-500'} uppercase">${i.bought ? 'Undo' : 'Đã mua ✅'}</button>
-                        <button onclick="deleteGift('${i.id}')" class="text-[10px] font-bold text-red-500 uppercase">Xoá 🗑️</button>
-                    </div>
-                </div>`;
-            });
-        });
-    </script>
+           confetti({
+               particleCount: 100,
+               spread: 160,
+               origin: { y: 0.5 },
+               colors: ['#f472b6', '#ec4899', '#ffffff', '#fbbf24']
+           });
+       };
+
+       window.addGift = async () => {
+           const nameInput = document.getElementById('gName');
+           const priceInput = document.getElementById('gPrice');
+           const cateInput = document.getElementById('gCate');
+           const linkInput = document.getElementById('gLink');
+           const noteInput = document.getElementById('gNote');
+           const btn = document.getElementById('mainAddBtn');
+
+           if(!nameInput.value || !priceInput.value) {
+               alert("nhớ điền tên quà và giá nha! ❤️");
+               return;
+           }
+           
+           btn.classList.remove('btn-clicked');
+           void btn.offsetWidth;
+           btn.classList.add('btn-clicked');
+
+           try {
+               iosTing.currentTime = 0;
+               iosTing.play().catch(() => {});
+               explosionEffect();
+
+               const docRef = await addDoc(giftCol, {
+                   name: nameInput.value,
+                   cate: cateInput.value,
+                   price: priceInput.value.replace(/,/g, ""),
+                   link: linkInput.value,
+                   note: noteInput.value,
+                   prio: window.currentPrio,
+                   bought: false,
+                   date: new Date()
+               });
+               
+               nameInput.value = '';
+               priceInput.value = '';
+               linkInput.value = '';
+               noteInput.value = '';
+               
+               let attempts = 0;
+               const findAndHighlight = setInterval(() => {
+                   const el = document.getElementById(`item-${docRef.id}`);
+                   if(el) {
+                       el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                       el.classList.add('highlight-gift');
+                       setTimeout(() => el.classList.remove('highlight-gift'), 3000);
+                       clearInterval(findAndHighlight);
+                   }
+                   if(attempts++ > 20) clearInterval(findAndHighlight);
+               }, 100);
+
+           } catch (e) { console.error(e); }
+       };
+
+       window.toggleBought = async (id, status) => {
+           clickSound.currentTime = 0;
+           clickSound.play().catch(() => {});
+           await updateDoc(doc(db, "gifts", id), { bought: !status });
+       };
+
+       window.deleteGift = async (id) => {
+           if(confirm("Xóa món quà này khỏi ước mơ hả? 🥺")) {
+               await deleteDoc(doc(db, "gifts", id));
+           }
+       };
+
+       onSnapshot(query(giftCol, orderBy("date", "desc")), (s) => {
+           const div = document.getElementById('list');
+           div.innerHTML = '';
+           let items = [];
+           s.forEach(d => items.push({ id: d.id, ...d.data() }));
+           
+           items.sort((a, b) => (prioScore[b.prio] || 0) - (prioScore[a.prio] || 0));
+           
+           items.forEach(i => {
+               const linkHTML = i.link ? `<a href="${i.link}" target="_blank" class="text-pink-400 text-[10px] underline block mt-2 font-bold uppercase tracking-wider">🔗 Nhấn vô để xem Link nha</a>` : '';
+               const noteHTML = i.note ? `<div class="text-[10px] text-gray-400 mt-2 italic bg-[#0f0f0f] p-3 rounded-lg border border-white/5">💬 Ghi chú: ${i.note}</div>` : '';
+               div.innerHTML += `
+               <div id="item-${i.id}" class="bg-[#161616] p-5 rounded-[25px] mb-4 border ${i.bought ? 'border-green-900/60 opacity-40' : 'border-white/5'} transition-all duration-500 shadow-xl relative">
+                   <div class="flex justify-between items-start">
+                       <div class="flex-1 pr-4">
+                           <div class="font-bold text-sm ${i.bought ? 'line-through text-gray-500' : 'text-white'}">${i.name}</div>
+                           <div class="flex gap-2 mt-2">
+                               <span class="text-[9px] bg-[#222] px-2 py-1 rounded text-gray-400 uppercase font-extrabold tracking-tighter">${i.cate}</span>
+                               <span class="text-[9px] text-pink-400 font-extrabold uppercase tracking-tighter">Ưu tiên: ${i.prio}</span>
+                           </div>
+                           ${noteHTML}
+                           ${linkHTML}
+                       </div>
+                       <div class="text-right text-yellow-500 font-bold text-sm">${Number(i.price).toLocaleString()}đ</div>
+                   </div>
+                   <div class="flex justify-end gap-5 mt-4 pt-4 border-t border-white/5">
+                       <button onclick="toggleBought('${i.id}', ${i.bought})" class="text-[10px] font-bold ${i.bought ? 'text-gray-500' : 'text-green-500'} uppercase transition-transform active:scale-90">${i.bought ? 'Hoàn tác' : 'Đã mua ✅'}</button>
+                       <button onclick="deleteGift('${i.id}')" class="text-[10px] font-bold text-red-500 uppercase transition-transform active:scale-90">Xoá 🗑️</button>
+                   </div>
+               </div>`;
+           });
+       });
+   </script>
 </head>
 <body class="p-4 custom-scrollbar pb-10">
-    <div class="max-w-md mx-auto">
-        
-        <!-- Header chuẩn ảnh 🌹 🫄 💌 -->
-        <div class="text-center mb-10 pt-4">
-            <h1 class="text-3xl header-title mb-2 flex items-center justify-center gap-2">
-                <span>🌹</span> Wishlist của Bòi Bói Boi <span>🫄</span>
-            </h1>
-            <p class="header-sub text-sm flex items-center justify-center gap-2">
-                <span>💌</span> <span>Thêm món quà anh thích vào đây nhoéeee</span>
-            </p>
-        </div>
+   <div class="max-w-md mx-auto">
+       
+       <div class="text-center mb-10 pt-4">
+           <h1 class="text-3xl header-title mb-2 flex items-center justify-center gap-2">
+               <span>🌹</span> Wishlist của Bòi Bói Boi <span>🫄</span>
+           </h1>
+           <p class="header-sub text-sm flex items-center justify-center gap-2">
+               <span>💌</span> <span>Thêm món quà anh thích vào đây nhoéeee</span>
+           </p>
+       </div>
 
-        <!-- Form nhập liệu đầy đủ -->
-        <div class="bg-[#161616] p-7 rounded-[40px] border border-white/5 space-y-6 shadow-2xl">
-            <div>
-                <p class="text-pink-300 text-[9px] font-bold mb-2 uppercase tracking-widest">💖 Tên quà tặng</p>
-                <input id="gName" class="w-full bg-[#222] p-4 rounded-2xl border border-transparent outline-none text-sm focus:border-pink-500 transition-all text-white" placeholder="...">
-            </div>
-            
-            <div class="relative">
-                <p class="text-pink-300 text-[9px] font-bold mb-2 uppercase tracking-widest">🏷️ Danh mục</p>
-                <select id="gCate" class="w-full bg-[#222] p-4 rounded-2xl border border-transparent outline-none text-sm focus:border-pink-500 text-white cursor-pointer transition-all">
-                    <option value="💕 Quà đôi">💕 Quà đôi & Lãng mạn</option>
-                    <option value="💻 Công nghệ">💻 Công nghệ</option>
-                    <option value="👕 Thời trang">👕 Thời trang & Phụ kiện</option>
-                    <option value="🏠 Đồ dùng">🏠 Đồ dùng hàng ngày</option>
-                </select>
-            </div>
+       <div class="bg-[#161616] p-7 rounded-[40px] border border-white/5 space-y-6 shadow-2xl relative z-10">
+           <div>
+               <p class="text-pink-300 text-[9px] font-bold mb-2 uppercase tracking-widest">💖 Tên quà tặng</p>
+               <input id="gName" class="w-full bg-[#222] p-4 rounded-2xl border border-transparent outline-none text-sm focus:border-pink-500 transition-all text-white" placeholder="Ví dụ: Vòng tay bạc, Váy babydoll...">
+           </div>
+           
+           <div class="relative">
+               <p class="text-pink-300 text-[9px] font-bold mb-2 uppercase tracking-widest">🏷️ Danh mục</p>
+               <select id="gCate" class="w-full bg-[#222] p-4 rounded-2xl border border-transparent outline-none text-sm focus:border-pink-500 text-white cursor-pointer transition-all">
+                   <option value="💕 Quà đôi">💕 Quà đôi & Lãng mạn</option>
+                   <option value="💻 Công nghệ">💻 Công nghệ</option>
+                   <option value="👕 Thời trang">👕 Thời trang & Phụ kiện</option>
+                   <option value="🏠 Đồ dùng">🏠 Đồ dùng hàng ngày</option>
+               </select>
+           </div>
 
-            <div>
-                <p class="text-pink-300 text-[9px] font-bold mb-2 uppercase tracking-widest">💰 Giá (VNĐ)</p>
-                <input id="gPrice" type="text" oninput="formatCurrency(this)" class="w-full bg-[#222] p-4 rounded-2xl border border-transparent outline-none text-sm focus:border-pink-500 font-mono text-white" placeholder="0">
-            </div>
+           <div>
+               <p class="text-pink-300 text-[9px] font-bold mb-2 uppercase tracking-widest">💰 Giá (VNĐ)</p>
+               <input id="gPrice" type="text" oninput="formatCurrency(this)" class="w-full bg-[#222] p-4 rounded-2xl border border-transparent outline-none text-sm focus:border-pink-500 font-mono text-white" placeholder="Ví dụ: 500,000">
+           </div>
 
-            <div>
-                <p class="text-pink-300 text-[9px] font-bold mb-2 uppercase tracking-widest">🔗 Link sản phẩm</p>
-                <input id="gLink" class="w-full bg-[#222] p-4 rounded-2xl border border-transparent outline-none text-sm focus:border-pink-500 transition-all text-white" placeholder="...">
-            </div>
+           <div>
+               <p class="text-pink-300 text-[9px] font-bold mb-2 uppercase tracking-widest">🔗 Link sản phẩm (Nếu có)</p>
+               <input id="gLink" class="w-full bg-[#222] p-4 rounded-2xl border border-transparent outline-none text-sm focus:border-pink-500 transition-all text-white" placeholder="Dán link Shopee, Tiktok vào đây...">
+           </div>
 
-            <div>
-                <p class="text-pink-300 text-[9px] font-bold mb-3 uppercase tracking-widest">Độ ưu tiên</p>
-                <div class="grid grid-cols-5 gap-1.5">
-                    <button onclick="selectPrio('Ước thôi', this)" class="prio-btn py-3 rounded-xl border border-[#333] bg-[#2a2a2a] text-[8px] text-gray-400 flex flex-col items-center">
-                        <span class="text-base mb-1">💬</span><span>Ước thôi</span>
-                    </button>
-                    <button onclick="selectPrio('Thích nha', this)" class="prio-btn py-3 rounded-xl border border-[#333] bg-[#2a2a2a] text-[8px] text-gray-400 flex flex-col items-center">
-                        <span class="text-base mb-1">🌹</span><span>Thích nha</span>
-                    </button>
-                    <button onclick="selectPrio('Muốn lắm', this)" class="prio-btn py-3 rounded-xl border border-pink-500 bg-[#3a2226] text-[8px] text-white flex flex-col items-center shadow-lg">
-                        <span class="text-base mb-1">🥺</span><span>Muốn lắm</span>
-                    </button>
-                    <button onclick="selectPrio('Cần rồi', this)" class="prio-btn py-3 rounded-xl border border-[#333] bg-[#2a2a2a] text-[8px] text-gray-400 flex flex-col items-center">
-                        <span class="text-base mb-1">💕</span><span>Cần rồi</span>
-                    </button>
-                    <button onclick="selectPrio('Phải có', this)" class="prio-btn py-3 rounded-xl border border-[#333] bg-[#2a2a2a] text-[8px] text-gray-400 flex flex-col items-center">
-                        <span class="text-base mb-1">🔥</span><span>Phải có</span>
-                    </button>
-                </div>
-            </div>
+           <div>
+               <p class="text-pink-300 text-[9px] font-bold mb-3 uppercase tracking-widest">Độ ưu tiên</p>
+               <div class="grid grid-cols-5 gap-1.5">
+                   <button onclick="selectPrio('Ước thôi', this)" class="prio-btn py-3 rounded-xl border border-[#333] bg-[#2a2a2a] text-[8px] text-gray-400 flex flex-col items-center">
+                       <span class="text-base mb-1">💬</span><span>Ước thôi</span>
+                   </button>
+                   <button onclick="selectPrio('Thích nha', this)" class="prio-btn py-3 rounded-xl border border-[#333] bg-[#2a2a2a] text-[8px] text-gray-400 flex flex-col items-center">
+                       <span class="text-base mb-1">🌹</span><span>Thích nha</span>
+                   </button>
+                   <button onclick="selectPrio('Muốn lắm', this)" class="prio-btn py-3 rounded-xl border border-pink-500 bg-[#3a2226] text-[8px] text-white flex flex-col items-center shadow-lg">
+                       <span class="text-base mb-1">🥺</span><span>Muốn lắm</span>
+                   </button>
+                   <button onclick="selectPrio('Cần rồi', this)" class="prio-btn py-3 rounded-xl border border-[#333] bg-[#2a2a2a] text-[8px] text-gray-400 flex flex-col items-center">
+                       <span class="text-base mb-1">💕</span><span>Cần rồi</span>
+                   </button>
+                   <button onclick="selectPrio('Phải có', this)" class="prio-btn py-3 rounded-xl border border-[#333] bg-[#2a2a2a] text-[8px] text-gray-400 flex flex-col items-center">
+                       <span class="text-base mb-1">🔥</span><span>Phải có</span>
+                   </button>
+               </div>
+           </div>
 
-            <div>
-                <p class="text-pink-300 text-[9px] font-bold mb-2 uppercase tracking-widest">🗒️ Ghi chú chi tiết</p>
-                <input id="gNote" class="w-full bg-[#222] p-4 rounded-2xl border border-transparent outline-none text-sm focus:border-pink-500 transition-all text-white" placeholder="...">
-            </div>
+           <div>
+               <p class="text-pink-300 text-[9px] font-bold mb-2 uppercase tracking-widest">🗒️ Ghi chú chi tiết</p>
+               <input id="gNote" class="w-full bg-[#222] p-4 rounded-2xl border border-transparent outline-none text-sm focus:border-pink-500 transition-all text-white" placeholder="Size, màu sắc, hay dặn dò anh iu...">
+           </div>
 
-            <!-- NÚT THÊM QUÀ SIÊU HIỆU ỨNG -->
-            <button id="mainAddBtn" onclick="addGift()" class="w-full bg-gradient-to-r from-pink-500 to-rose-600 py-6 rounded-[35px] font-bold text-sm shadow-xl mt-4 uppercase tracking-[0.2em] outline-none text-white">
-                + Thêm món quà ❤️
-            </button>
-        </div>
+           <button id="mainAddBtn" onclick="addGift()" class="w-full bg-gradient-to-r from-pink-500 to-rose-600 py-5 rounded-[30px] font-bold text-sm shadow-xl mt-4 uppercase tracking-[0.2em] outline-none text-white relative">
+               + Thêm món quà ❤️
+           </button>
+       </div>
 
-        <!-- Danh sách -->
-        <div class="mt-16">
-            <h2 class="text-[10px] font-bold text-gray-500 mb-8 border-b border-white/5 pb-4 flex items-center justify-between uppercase tracking-widest">
-                <span>🧚‍♀️ DANH SÁCH ƯỚC MƠ</span>
-            </h2>
-            <div id="list" class="space-y-1"></div>
-        </div>
-    </div>
+       <div class="mt-16">
+           <h2 class="text-[10px] font-bold text-gray-500 mb-8 border-b border-white/5 pb-4 flex items-center justify-between uppercase tracking-widest">
+               <span>🧚‍♀️ DANH SÁCH ƯỚC MƠ</span>
+           </h2>
+           <div id="list" class="space-y-1"></div>
+       </div>
+   </div>
 </body>
 </html>
