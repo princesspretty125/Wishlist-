@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Wishlist App</title>
+    <title>Wishlist của Bòi Bói Boi 🫃🏻</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
@@ -28,25 +28,35 @@
 
         let selectedPriority = 1; 
 
-        window.selectPriority = function(val) {
+        const getPriorityStyle = (priority) => {
+            switch (priority) {
+                case 5: return 'bg-red-600 text-white shadow-[0_0_10px_rgba(220,38,38,0.4)]';
+                case 4: return 'bg-pink-500 text-white';
+                case 3: return 'bg-amber-500 text-black';
+                case 2: return 'bg-emerald-500 text-white';
+                case 1: return 'bg-zinc-600 text-zinc-200';
+                default: return 'bg-zinc-800 text-zinc-400';
+            }
+        };
+
+        window.selectPriority = (val) => {
             selectedPriority = val;
             document.querySelectorAll('.priority-btn').forEach(btn => btn.classList.remove('active-priority'));
             document.getElementById('priority-' + val).classList.add('active-priority');
-        }
+        };
 
-        const priceInput = document.getElementById('giftPrice');
-        priceInput.addEventListener('input', (e) => {
+        document.getElementById('giftPrice').addEventListener('input', (e) => {
             let value = e.target.value.replace(/\D/g, "");
             e.target.value = new Intl.NumberFormat('en-US').format(value);
         });
 
-        window.addGift = function(btn) {
+        window.addGift = (btn) => {
             const name = document.getElementById('giftName').value;
             const category = document.getElementById('category').value;
             const price = document.getElementById('giftPrice').value;
             const note = document.getElementById('giftNote').value;
 
-            if (!name || !price) return alert("Nhập đủ tên nhé!");
+            if (!name || !price) return alert("Nhập đủ tên và giá nhé!");
 
             btn.classList.add('btn-bounce-glow');
             setTimeout(() => btn.classList.remove('btn-bounce-glow'), 400);
@@ -60,154 +70,156 @@
 
             triggerGiftBurst();
 
-            // RESET FORM
             document.getElementById('giftName').value = "";
             document.getElementById('giftPrice').value = "";
             document.getElementById('giftNote').value = "";
             document.getElementById('category').selectedIndex = 0;
             selectPriority(1); 
+
+            setTimeout(() => {
+                const firstItem = document.querySelector('#wishlistContainer > div:first-child');
+                if (firstItem) {
+                    firstItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    firstItem.style.transition = "all 0.6s ease";
+                    firstItem.style.boxShadow = "0 0 40px rgba(244, 114, 182, 0.7)";
+                    firstItem.style.borderColor = "#f472b6";
+                    setTimeout(() => {
+                        firstItem.style.boxShadow = "none";
+                        firstItem.style.borderColor = "#27272a"; 
+                    }, 2500);
+                }
+            }, 600);
         };
 
         onValue(wishlistRef, (snapshot) => {
             const container = document.getElementById('wishlistContainer');
             container.innerHTML = "";
             const data = snapshot.val();
-            
             if (data) {
                 const items = Object.keys(data).map(key => ({ id: key, ...data[key] }));
-
-                items.sort((a, b) => {
-                    if (b.priority !== a.priority) return b.priority - a.priority;
-                    return b.createdAt - a.createdAt;
-                });
+                items.sort((a, b) => (b.priority !== a.priority) ? (b.priority - a.priority) : (b.createdAt - a.createdAt));
 
                 items.forEach(item => {
                     const isBought = item.status === 'bought';
-                    const labels = ["", "💬 FOMO", "🌷 Thích nha", "🥺 Muốn lắm", "💕 Cần rồi", "🔥 PHẢI CÓ"];
-
+                    const labels = ["", "💬 FOMO", "🌷 Thích nha", "🙄 Muốn lắm", "💕 Cần rồi", "🔥 PHẢI CÓ"];
                     const html = `
-                        <div class="p-5 mb-4 rounded-[2.5rem] border border-zinc-800 bg-[#0d0d0d] transition-all duration-500 ${isBought ? 'opacity-30 grayscale' : ''}">
+                        <div class="p-6 mb-5 rounded-[2.5rem] border border-zinc-800 bg-[#0d0d0d] transition-all duration-500 ${isBought ? 'opacity-30 grayscale' : ''}">
                             <div class="flex justify-between items-center">
                                 <div class="flex-1 pr-3">
-                                    <span class="text-[9px] px-2 py-0.5 rounded-full font-bold ${item.priority >= 4 ? 'bg-pink-500 text-white' : 'bg-zinc-800 text-zinc-400'}">
+                                    <span class="text-[9px] px-2.5 py-1 rounded-full font-black uppercase tracking-wider ${getPriorityStyle(item.priority)}">
                                         ${labels[item.priority]}
                                     </span>
-                                    <h3 class="font-bold text-lg mt-2 ${isBought ? 'line-through text-zinc-600' : 'text-pink-100'}">${item.name}</h3>
-                                    <p class="text-[10px] text-zinc-500 uppercase font-bold tracking-widest mt-0.5">${item.category} • ${item.price}đ</p>
-                                    ${item.note ? `<p class="text-xs text-zinc-400 mt-2 italic bg-zinc-900/50 p-3 rounded-2xl border border-zinc-800/30">Note: ${item.note}</p>` : ''}
+                                    <h3 class="font-bold text-xl mt-3 ${isBought ? 'line-through text-zinc-600' : 'text-pink-100'}">${item.name}</h3>
+                                    <p class="text-[11px] text-zinc-500 font-bold tracking-widest mt-1">💕 ${item.category} • ${item.price}đ</p>
+                                    ${item.note ? `<p class="text-xs text-zinc-400 mt-3 italic bg-zinc-900/80 p-3 rounded-2xl border border-zinc-800/40">Note: ${item.note}</p>` : ''}
                                 </div>
-                                
-                                <div class="flex flex-col gap-3">
-                                    <button title="Đã mua" onclick="updateStatus('${item.id}', '${isBought ? 'pending' : 'bought'}')" 
-                                            class="w-12 h-12 ${isBought ? 'bg-green-500 border-green-400' : 'bg-zinc-900 border-zinc-800'} rounded-2xl flex items-center justify-center active:scale-90 shadow-xl border text-xl">
-                                        💃
-                                    </button>
-                                    <button title="Xoá" onclick="deleteItem('${item.id}')" 
-                                            class="w-12 h-12 bg-zinc-900 border-zinc-800 rounded-2xl flex items-center justify-center active:scale-90 shadow-xl border text-xl">
-                                        🗑️
-                                    </button>
+                                <div class="flex flex-col gap-4">
+                                    <button onclick="updateStatus('${item.id}', '${isBought ? 'pending' : 'bought'}')" class="w-14 h-14 ${isBought ? 'bg-green-500' : 'bg-zinc-900'} border border-zinc-800 rounded-2xl flex items-center justify-center active:scale-90 text-2xl shadow-lg">💃</button>
+                                    <button onclick="deleteItem('${item.id}')" class="w-14 h-14 bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center justify-center active:scale-90 text-2xl shadow-lg">🗑️</button>
                                 </div>
                             </div>
-                        </div>
-                    `;
+                        </div>`;
                     container.insertAdjacentHTML('beforeend', html);
                 });
             }
         });
 
-        window.deleteItem = (id) => { if(confirm("Bạn có chắc muốn xoá món này không?")) remove(ref(db, `gifts/${id}`)); };
+        window.deleteItem = (id) => { if(confirm("Xoá món quà này nhé?")) remove(ref(db, `gifts/${id}`)); };
         window.updateStatus = (id, status) => update(ref(db, `gifts/${id}`), { status });
     </script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
 
     <style>
-        body { background-color: #000; color: #fff; font-family: -apple-system, system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
-        input, select, textarea { background-color: #121212 !important; border: 1px solid #222 !important; color: white !important; outline: none; transition: 0.3s; }
-        input:focus, textarea:focus { border-color: #f472b6 !important; background-color: #161616 !important; }
+        body { background-color: #000; color: #fff; font-family: -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
+        input, select, textarea { background-color: #121212 !important; border: 1px solid #222 !important; color: white !important; outline: none; }
+        input:focus, textarea:focus { border-color: #f472b6 !important; }
         .card-main { background: #0b0b0b; border: 1px solid #1a1a1a; border-radius: 2.5rem; }
-        .priority-btn { background: #121212; border: 1px solid #222; transition: all 0.3s; color: #555; font-size: 11px; font-weight: bold; }
-        .active-priority { background: rgba(244, 114, 182, 0.2); border-color: #f472b6; color: #f472b6; transform: scale(1.02); }
-        .btn-bounce-glow { animation: bounceGlow 0.4s ease-out; background-color: #f472b6 !important; color: white !important; }
-        @keyframes bounceGlow { 0% { transform: scale(1); } 50% { transform: scale(1.03); box-shadow: 0 0 20px rgba(244, 114, 182, 0.6); } 100% { transform: scale(1); } }
-        .gift-box { position: fixed; font-size: 32px; pointer-events: none; z-index: 9999; }
+        .priority-btn { background: #121212; border: 1px solid #222; transition: 0.3s; color: #666; font-size: 11px; font-weight: bold; }
+        .active-priority { background: rgba(244, 114, 182, 0.15); border-color: #f472b6; color: #f472b6; transform: scale(1.02); }
+        .btn-bounce-glow { animation: bounceGlow 0.4s ease-out; background-color: #f472b6 !important; }
+        @keyframes bounceGlow { 0% { transform: scale(1); } 50% { transform: scale(1.05); box-shadow: 0 0 30px rgba(244, 114, 182, 0.5); } 100% { transform: scale(1); } }
+        .gift-box { position: fixed; font-size: 35px; pointer-events: none; z-index: 9999; }
         select { -webkit-appearance: none; appearance: none; }
     </style>
 </head>
 <body class="flex justify-center min-h-screen p-4 pb-24">
     <div class="w-full max-w-md">
-        <div class="text-center my-10">
-            <h1 class="text-4xl font-black italic text-pink-200 tracking-tighter">Wishlist của Bòi Bói Boi🫃🏻</h1>
-            <p class="text-zinc-600 text-[10px] mt-1 tracking-[0.2em] uppercase font-bold italic">Thêm món quà anh thích vào đây nhoéeee💌</p>
+        <div class="text-center my-12">
+            <h1 class="text-4xl font-black italic text-pink-200 tracking-tighter">Wishlist của Bòi Bói Boi 🫃🏻</h1>
+            <p class="text-zinc-600 text-[10px] mt-2 tracking-[0.2em] uppercase font-bold italic">Thêm món quà anh thích vào đây nhoéeee 💌</p>
         </div>
 
-        <div class="card-main p-7 mb-14 shadow-2xl border-t border-zinc-800/50">
-            <div class="space-y-5">
+        <div class="card-main p-8 mb-16 shadow-2xl border-t border-zinc-800/30">
+            <div class="space-y-6">
                 <div>
-                    <label class="text-[9px] font-black text-zinc-600 ml-1 uppercase italic tracking-widest">❤️ Tên quà tặng</label>
-                    <input type="text" id="giftName" placeholder="Tên món quà..." class="w-full p-4.5 rounded-2xl mt-1.5 text-sm font-medium">
+                    <label class="text-[10px] font-black text-zinc-600 ml-1 uppercase italic tracking-widest">❤️ Tên quà tặng</label>
+                    <input type="text" id="giftName" placeholder="Ví dụ: Vòng tay bạc khắc tên..." class="w-full p-4.5 rounded-2xl mt-2 text-sm">
                 </div>
                 
-                <div class="grid grid-cols-2 gap-3">
+                <div class="grid grid-cols-2 gap-4">
                     <div class="relative">
-                        <label class="text-[9px] font-black text-zinc-600 ml-1 uppercase italic tracking-widest">🏷️ Danh mục</label>
-                        <select id="category" class="w-full p-4.5 rounded-2xl mt-1.5 text-sm appearance-none pr-10">
-                            <option value="💕 Lãng Mạn">💕 Lãng Mạn</option>
-                            <option value="🎮 Công Nghệ">🎮 Công Nghệ</option>
-                            <option value="👕 Thời Trang">👕 Thời Trang</option>
-                            <option value="⚽ Thể Thao">⚽ Thể Thao</option>
+                        <label class="text-[10px] font-black text-zinc-600 ml-1 uppercase italic tracking-widest">🏷️ Danh mục</label>
+                        <select id="category" class="w-full p-4.5 rounded-2xl mt-2 text-sm appearance-none pr-10">
+                            <option value="Quà Đôi & Lãng Mạn">💕 Quà Đôi & Lãng Mạn</option>
+                            <option value="Công Nghệ">🎮 Công Nghệ</option>
+                            <option value="Thời Trang">👕 Thời Trang</option>
+                            <option value="Thể Thao">⚽ Thể Thao</option>
                         </select>
                         <i class="fas fa-chevron-down absolute right-4 bottom-5 text-zinc-700 text-[10px]"></i>
                     </div>
                     <div>
-                        <label class="text-[9px] font-black text-zinc-600 ml-1 uppercase italic tracking-widest">$ Giá (VNĐ)</label>
-                        <input type="text" id="giftPrice" placeholder="500,000" class="w-full p-4.5 rounded-2xl mt-1.5 text-sm font-bold">
+                        <label class="text-[10px] font-black text-zinc-600 ml-1 uppercase italic tracking-widest">$ Giá ước tính</label>
+                        <div class="relative">
+                            <input type="text" id="giftPrice" placeholder="500,000" class="w-full p-4.5 rounded-2xl mt-2 text-sm font-bold pr-10">
+                            <span class="absolute right-4 bottom-4.5 text-zinc-600 font-bold">đ</span>
+                        </div>
                     </div>
                 </div>
 
                 <div>
-                    <label class="text-[9px] font-black text-zinc-600 ml-1 uppercase italic tracking-widest mb-2 block">🔥 Độ ưu tiên</label>
+                    <label class="text-[10px] font-black text-zinc-600 ml-1 uppercase italic tracking-widest mb-3 block">🔥 Độ ưu tiên</label>
                     <div class="grid grid-cols-1 gap-2">
-                        <button onclick="selectPriority(5)" id="priority-5" class="priority-btn p-4 rounded-2xl italic">🔥 PHẢI CÓ</button>
-                        <button onclick="selectPriority(4)" id="priority-4" class="priority-btn p-4 rounded-2xl italic">💕 Cần rồi</button>
-                        <button onclick="selectPriority(3)" id="priority-3" class="priority-btn p-4 rounded-2xl italic">🥺 FOMO</button>
+                        <button onclick="selectPriority(1)" id="priority-1" class="priority-btn p-4 rounded-2xl active-priority italic">💬 FOMO</button>
                         <button onclick="selectPriority(2)" id="priority-2" class="priority-btn p-4 rounded-2xl italic">🌷 Thích nha</button>
-                        <button onclick="selectPriority(1)" id="priority-1" class="priority-btn p-4 rounded-2xl active-priority italic">💬 Ước thôi</button>
+                        <button onclick="selectPriority(3)" id="priority-3" class="priority-btn p-4 rounded-2xl italic">🙄 Muốn lắm</button>
+                        <button onclick="selectPriority(4)" id="priority-4" class="priority-btn p-4 rounded-2xl italic">💕 Cần rồi</button>
+                        <button onclick="selectPriority(5)" id="priority-5" class="priority-btn p-4 rounded-2xl italic text-red-500">🔥 PHẢI CÓ</button>
                     </div>
                 </div>
 
                 <div>
-                    <label class="text-[9px] font-black text-zinc-600 ml-1 uppercase italic tracking-widest">📝 Ghi chú</label>
-                    <textarea id="giftNote" placeholder="Màu sắc, kích thước, link..." class="w-full p-4 rounded-2xl mt-1.5 text-sm h-24 resize-none font-medium"></textarea>
+                    <label class="text-[10px] font-black text-zinc-600 ml-1 uppercase italic tracking-widest">📝 Ghi chú thêm</label>
+                    <textarea id="giftNote" placeholder="Màu hồng nhé anh, size M..." class="w-full p-4.5 rounded-2xl mt-2 text-sm h-28 resize-none font-medium"></textarea>
                 </div>
 
-                <button onclick="addGift(this)" class="w-full py-5 bg-white text-black rounded-[2.5rem] font-black text-xs tracking-[0.2em] uppercase active:scale-95 transition-all shadow-xl">
-                    🚀 THÊM VÀO WISHLIST
+                <button onclick="addGift(this)" class="w-full py-5 bg-pink-600 text-white rounded-[2.5rem] font-black text-xs tracking-[0.2em] uppercase active:scale-95 transition-all shadow-xl">
+                    🚀 THÊM VÀO 💖
                 </button>
             </div>
         </div>
 
-        <div class="flex items-center gap-3 mb-8 px-2">
+        <div class="flex items-center gap-4 mb-10 px-2">
             <h2 class="text-2xl font-black text-pink-200 italic">Danh sách ước mơ 🧚🏻‍♂️</h2>
-            <div class="h-[1px] flex-1 bg-zinc-800"></div>
+            <div class="h-[1px] flex-1 bg-zinc-900"></div>
         </div>
 
-        <div id="wishlistContainer" class="space-y-4"></div>
+        <div id="wishlistContainer" class="space-y-5"></div>
     </div>
 
     <script>
         function triggerGiftBurst() {
-            const icons = ['🎁', '💃', '✨', '💖', '🍭', '🧸'];
-            for (let i = 0; i < 15; i++) {
+            const icons = ['🎁', '💃', '✨', '💖', '💍', '🧸'];
+            for (let i = 0; i < 20; i++) {
                 const b = document.createElement('div');
                 b.className = 'gift-box';
                 b.innerText = icons[Math.floor(Math.random() * icons.length)];
                 b.style.left = '50%'; b.style.top = '45%';
                 document.body.appendChild(b);
                 anime({
-                    targets: b, translateX: () => anime.random(-250, 250), translateY: () => anime.random(-500, 50),
+                    targets: b, translateX: () => anime.random(-300, 300), translateY: () => anime.random(-600, 0),
                     rotate: () => anime.random(-360, 360), opacity: [1, 0], scale: [0, 2, 0.5],
-                    duration: 1800, easing: 'easeOutExpo', complete: () => b.remove()
+                    duration: 2000, easing: 'easeOutExpo', complete: () => b.remove()
                 });
             }
         }
