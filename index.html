@@ -9,32 +9,51 @@
     <style>
         :root { --bg: #000; --card: #121212; --text: #fff; --gray: #888; --pink: #ff2d55; }
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; overflow-x: hidden; }
+        
         .tab-menu { display: flex; justify-content: center; gap: 20px; padding: 20px 0; background: #000; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #222; }
         .tab-link { color: var(--gray); font-weight: 800; cursor: pointer; font-size: 14px; text-transform: uppercase; transition: 0.3s; padding: 5px 10px; }
         .tab-link.active { color: var(--pink); border-bottom: 2px solid var(--pink); }
+
         .slider { display: flex; width: 200vw; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .sheet { width: 100vw; padding: 20px; box-sizing: border-box; min-height: 100vh; }
+
         h1 { font-weight: 800; font-size: 26px; text-align: center; margin-bottom: 5px; color: #ff85a2; }
         .sub { text-align: center; font-size: 10px; color: var(--gray); letter-spacing: 1px; margin-bottom: 30px; text-transform: uppercase; }
+        
         .input-card { background: var(--card); padding: 20px; border-radius: 25px; margin-bottom: 30px; border: 1px solid #222; }
         label { font-size: 10px; font-weight: 600; color: var(--gray); display: block; margin-bottom: 8px; }
-        input, select, textarea { width: 100%; background: #1a1a1a; border: 1px solid #222; border-radius: 12px; padding: 12px; color: white; margin-bottom: 15px; outline: none; font-family: inherit; }
+        input, textarea { width: 100%; background: #1a1a1a; border: 1px solid #222; border-radius: 12px; padding: 12px; color: white; margin-bottom: 15px; outline: none; font-family: inherit; box-sizing: border-box; }
+        
+        /* Select có mũi tên */
+        .select-wrapper { position: relative; width: 100%; margin-bottom: 15px; }
+        select { width: 100%; background: #1a1a1a; border: 1px solid #222; border-radius: 12px; padding: 12px; color: white; outline: none; font-family: inherit; appearance: none; cursor: pointer; }
+        .select-wrapper::after { content: '⌵'; position: absolute; right: 15px; top: 50%; transform: translateY(-30%); color: var(--gray); pointer-events: none; font-size: 18px; }
+
+        .row { display: flex; gap: 10px; align-items: flex-start; }
+        
         .priority-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px; }
-        .p-btn { background: #1a1a1a; border: 1px solid #222; padding: 14px; border-radius: 12px; color: var(--gray); text-align: center; cursor: pointer; transition: 0.3s; font-weight: 600; }
+        .p-btn { background: #1a1a1a; border: 1px solid #222; padding: 14px; border-radius: 12px; color: var(--gray); text-align: center; cursor: pointer; transition: 0.3s; font-weight: 600; font-family: inherit; }
         .p-btn.active { border-color: var(--pink); color: white; background: rgba(255, 45, 85, 0.1); box-shadow: 0 0 15px var(--pink); }
+
         .add-btn { width: 100%; background: #fff; color: #000; border: none; padding: 18px; border-radius: 40px; font-weight: 800; font-size: 16px; cursor: pointer; transition: 0.3s; }
         .add-btn:active { transform: scale(0.9); }
+
         .item { background: var(--card); padding: 20px; border-radius: 25px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; transition: 0.5s; }
-        .item.new-added { animation: bFlash 1.5s ease; border: 2px solid var(--pink); }
+        .item.highlight-new { animation: bFlash 1.5s ease; border: 2px solid var(--pink); }
         @keyframes bFlash { 0% { transform: scale(0.8); background: #333; } 50% { transform: scale(1.05); background: #444; } 100% { transform: scale(1); background: var(--card); } }
         .item.done { opacity: 0.3; filter: grayscale(1); }
+        
         .item-info h3 { margin: 0; font-size: 18px; }
-        .note-text { color: #888; font-size: 13px; display: block; margin-top: 5px; }
+        .note-text { color: #888; font-size: 13px; display: block; margin-top: 5px; font-style: italic; }
         .badge { font-size: 9px; padding: 3px 8px; border-radius: 6px; color: white; display: inline-block; margin-bottom: 5px; font-weight: bold; }
+        
         .item-btns { display: flex; flex-direction: column; gap: 10px; }
         .btn-circle { width: 45px; height: 45px; border-radius: 50%; border: none; background: #222; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; }
-        .img-box { width: 100%; height: 150px; background: #1a1a1a; border-radius: 15px; border: 1px dashed #444; display: flex; align-items: center; justify-content: center; margin-bottom: 15px; overflow: hidden; }
+
+        .img-box-wrapper { position: relative; width: 130px; margin-bottom: 15px; cursor: pointer; }
+        .img-box { width: 130px; height: 130px; background: #1a1a1a; border-radius: 15px; border: 1px dashed #444; display: flex; align-items: center; justify-content: center; overflow: hidden; }
         .img-box img { width: 100%; height: 100%; object-fit: cover; }
+        .cam-icon { position: absolute; bottom: -5px; right: -5px; width: 35px; height: 35px; background: #333; border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; border: 2px solid #000; font-size: 16px; }
     </style>
 </head>
 <body>
@@ -49,36 +68,82 @@
         <h1>Wishlist của Bòi Bói Boi 🫃🏻</h1>
         <p class="sub">THÊM MÓN QUÀ ANH THÍCH VÀO ĐÂY NHOÉEEE 💌</p>
         <div class="input-card">
+            <label>❤️ TÊN QUÀ TẶNG</label>
             <input type="text" id="n1" placeholder="Tên món quà...">
-            <div class="priority-group">
-                <button class="p-btn" onclick="setP(5, '🔥 PHẢI CÓ', '#ff4d4d', this)">🔥 PHẢI CÓ</button>
-                <button class="p-btn" onclick="setP(4, '💕 Cần rồi', '#ff85a2', this)">💕 Cần rồi</button>
-                <button class="p-btn" onclick="setP(3, '🙄 FOMO', '#ffd93d', this)">🙄 FOMO</button>
-                <button class="p-btn" onclick="setP(2, '🌷 Thích nha', '#6BCB77', this)">🌷 Thích nha</button>
+            <div class="row">
+                <div style="flex:1">
+                    <label>📂 DANH MỤC</label>
+                    <div class="select-wrapper">
+                        <select id="c1">
+                            <option>💕 Lãng Mạn</option>
+                            <option>👕 Thời Trang</option>
+                            <option>💻 Công Nghệ</option>
+                            <option>⚽ Thể Thao</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="flex:1">
+                    <label>$ GIÁ ƯỚC TÍNH</label>
+                    <input type="text" id="p1" placeholder="500,000" onkeyup="fmt(this)">
+                </div>
             </div>
-            <textarea id="note1" placeholder="Ghi chú thêm..."></textarea>
-            <button class="add-btn" onclick="saveData('gifts')">🚀 THÊM VÀO WISHLIST</button>
+            <label>🔥 ĐỘ ƯU TIÊN</label>
+            <div class="priority-group">
+                <button class="p-btn" data-l="5">🔥 PHẢI CÓ</button>
+                <button class="p-btn" data-l="4">💕 Cần rồi</button>
+                <button class="p-btn" data-l="3">🥺 Muốn lắm</button>
+                <button class="p-btn" data-l="2">🌷 Thích nha</button>
+                <button class="p-btn" data-l="1">💬 FOMO</button>
+            </div>
+            <label>📝 GHI CHÚ</label>
+            <textarea id="nt1" placeholder="Màu sắc, kích thước..."></textarea>
+            <button class="add-btn" onclick="handleSave('gifts')">🚀 THÊM VÀO WISHLIST</button>
         </div>
-        <h2 id="scroll1">Danh sách ước mơ 🧚‍♀️</h2>
+        <h2 id="head1">Danh sách ước mơ 🦋</h2>
         <div id="list1"></div>
     </div>
 
     <div class="sheet">
         <h1>Thèm Ăn Quá À 🤤</h1>
-        <p class="sub">CHỌN MÓN ĐI ĂN CÙNG NHAU NÈ 🍤</p>
+        <p class="sub">THÊM MÓN MUỐN ĐI ĂN CÙNG NHAU NÈ 🍤</p>
         <div class="input-card">
-            <div class="img-box" onclick="document.getElementById('f').click()">
-                <img id="p" style="display:none"> <span id="t">Bấm để chọn ảnh</span>
-            </div>
-            <input type="file" id="f" hidden accept="image/*" onchange="readImg(this)">
+            <label>🍜 TÊN MÓN ĂN</label>
             <input type="text" id="n2" placeholder="Tên món ăn...">
-            <div class="priority-group">
-                <button class="p-btn" onclick="setP(5, '🔥 PHẢI ĂN', '#ff4d4d', this)">🔥 PHẢI ĂN</button>
-                <button class="p-btn" onclick="setP(2, '😋 Thèm thèm', '#6BCB77', this)">😋 Thèm thèm</button>
+            
+            <label>🖼️ ẢNH MÓN ĂN</label>
+            <div class="img-box-wrapper" onclick="document.getElementById('fileInp').click()">
+                <div class="img-box">
+                    <img id="prevImg" style="display:none"> <span id="prevTxt" style="color:#444">Chọn ảnh</span>
+                </div>
+                <div class="cam-icon">📷</div>
             </div>
-            <button class="add-btn" onclick="saveData('foods')">😋 LƯU MÓN ĂN</button>
+            <input type="file" id="fileInp" hidden accept="image/*" onchange="previewImg(this)">
+
+            <div class="row">
+                <div style="flex:1">
+                    <label>📂 KIỂU ĂN</label>
+                    <div class="select-wrapper">
+                        <select id="c2">
+                            <option>🍲 Lẩu/Nướng</option>
+                            <option>🍣 Đồ Nhật/Hàn</option>
+                            <option>🍰 Tráng miệng</option>
+                            <option>☕ Cà phê</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="flex:1">
+                    <label>$ GIÁ DỰ KIẾN</label>
+                    <input type="text" id="p2" placeholder="200,000" onkeyup="fmt(this)">
+                </div>
+            </div>
+            <label>🔥 ĐỘ THÈM</label>
+            <div class="priority-group">
+                <button class="p-btn" data-l="5">🔥 PHẢI ĂN</button>
+                <button class="p-btn" data-l="2">😋 Thèm thèm</button>
+            </div>
+            <button class="add-btn" onclick="handleSave('foods')">📡 BẮN TÍN HIỆU</button>
         </div>
-        <h2 id="scroll2">Danh sách thèm thuồng 🍤</h2>
+        <h2 id="head2">Danh sách thèm thuồng 🍤</h2>
         <div id="list2"></div>
     </div>
 </div>
@@ -98,47 +163,60 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    let curP = null; let curImg = ""; let lastKey = "";
+    let curP = null; let curImg = ""; let lastId = "";
+    const clrs = ["", "#4D96FF", "#6BCB77", "#ffd93d", "#ff85a2", "#ff4d4d"];
 
     window.goTab = (i) => {
         document.getElementById('mainSlider').style.transform = `translateX(-${i * 100}vw)`;
         document.querySelectorAll('.tab-link').forEach((l, idx) => l.classList.toggle('active', i === idx));
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    window.setP = (lv, txt, clr, btn) => {
-        btn.parentElement.querySelectorAll('.p-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        curP = { lv, txt, clr };
-    };
-
-    window.readImg = (input) => {
+    window.previewImg = (input) => {
         const r = new FileReader();
-        r.onload = (e) => { 
-            document.getElementById('p').src = e.target.result; 
-            document.getElementById('p').style.display = 'block';
-            document.getElementById('t').style.display = 'none';
-            curImg = e.target.result; 
+        r.onload = (e) => {
+            document.getElementById('prevImg').src = e.target.result;
+            document.getElementById('prevImg').style.display = 'block';
+            document.getElementById('prevTxt').style.display = 'none';
+            curImg = e.target.result;
         };
         r.readAsDataURL(input.files[0]);
     };
 
-    window.saveData = (path) => {
+    document.querySelectorAll('.p-btn').forEach(btn => {
+        btn.onclick = function() {
+            this.parentElement.querySelectorAll('.p-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            curP = { lv: parseInt(this.dataset.l), txt: this.innerText, clr: clrs[this.dataset.l] };
+        };
+    });
+
+    window.fmt = (i) => { i.value = i.value.replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ","); };
+
+    window.handleSave = (path) => {
         const isG = path === 'gifts';
-        const name = document.getElementById(isG ? 'n1' : 'n2').value;
-        const note = isG ? document.getElementById('note1').value : "";
-        if(!name || !curP) return alert("Nhập đủ thông tin má ơi!");
+        const n = document.getElementById(isG ? 'n1' : 'n2').value;
+        const p = document.getElementById(isG ? 'p1' : 'p2').value;
+        const c = document.getElementById(isG ? 'c1' : 'c2').value;
+        const nt = isG ? document.getElementById('nt1').value : "";
+
+        if(!n || !curP) return alert("Nhập đủ thông tin má ơi!");
 
         push(ref(db, path), {
-            name, p: curP, note, img: curImg, status: 'wait', time: Date.now()
+            name: n, price: p || "0", cate: c, p: curP, note: nt, img: isG ? "" : curImg, status: 'wait', time: Date.now()
         }).then((res) => {
-            lastKey = res.key;
-            const ics = isG ? ['🎁', '💖', '✨'] : ['🍕', '🍣', '🍱'];
-            ics.forEach(ic => confetti({ particleCount: 40, spread: 70, origin: { y: 0.7 }, shapes: [confetti.shapeFromText({ text: ic, scalar: 2 })] }));
-            document.getElementById(isG ? 'scroll1' : 'scroll2').scrollIntoView({ behavior: 'smooth' });
+            lastId = res.key;
+            const ics = isG ? ['🎁', '💖', '✨'] : ['🍱', '🍣', '🍤'];
+            ics.forEach((ic, i) => setTimeout(() => confetti({ particleCount: 30, spread: 60, origin: { y: 0.8 }, shapes: [confetti.shapeFromText({ text: ic, scalar: 2 })] }), i * 150));
+            
+            document.getElementById(isG ? 'head1' : 'head2').scrollIntoView({ behavior: 'smooth' });
+            
             document.getElementById(isG ? 'n1' : 'n2').value = "";
-            if(isG) document.getElementById('note1').value = "";
-            curImg = ""; curP = null;
+            document.getElementById(isG ? 'p1' : 'p2').value = "";
+            if(isG) document.getElementById('nt1').value = "";
+            else { document.getElementById('prevImg').style.display='none'; document.getElementById('prevTxt').style.display='block'; curImg=""; }
             document.querySelectorAll('.p-btn').forEach(b => b.classList.remove('active'));
+            curP = null;
         });
     };
 
@@ -147,12 +225,14 @@
             const arr = [];
             s.forEach(c => { arr.push({ id: c.key, ...c.val() }); });
             arr.sort((a, b) => b.p.lv - a.p.lv);
+
             document.getElementById(target).innerHTML = arr.map(i => `
-                <div class="item ${i.status=='done'?'done':''} ${i.id === lastKey ? 'new-added' : ''}" style="border-left: 6px solid ${i.p.clr}">
-                    <div class="item-info">
+                <div class="item ${i.status=='done'?'done':''} ${i.id === lastId ? 'highlight-new' : ''}" style="border-left: 6px solid ${i.p.clr}">
+                    <div style="flex:1">
                         <span class="badge" style="background:${i.p.clr}">${i.p.txt}</span>
-                        ${i.img ? `<img src="${i.img}" style="width:130px;display:block;margin:10px 0;border-radius:15px">` : ''}
+                        ${i.img ? `<img src="${i.img}" style="width:130px;display:block;margin:10px 0;border-radius:12px">` : ''}
                         <h3>${i.name}</h3>
+                        <p style="font-size:13px; color:var(--gray); margin:5px 0">${i.price}đ • ${i.cate}</p>
                         ${i.note ? `<span class="note-text">📝 ${i.note}</span>` : ''}
                     </div>
                     <div class="item-btns">
