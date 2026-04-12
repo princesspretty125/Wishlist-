@@ -21,15 +21,23 @@
         .select-wrapper::after { content: '▼'; font-size: 10px; color: var(--pink); position: absolute; right: 15px; top: 22px; pointer-events: none; }
         .row { display: grid; grid-template-columns: 1.2fr 1fr; gap: 10px; }
         .p-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px; }
-        .p-btn { background: #1c1c1e; border: 1.5px solid #2c2c2e; padding: 15px; border-radius: 20px; color: #fff; font-size: 14px; font-weight: 600; cursor: pointer; text-align: center; transition: 0.2s; }
-        .p-btn.active { border-color: var(--pink); background: rgba(242, 162, 192, 0.2); color: var(--pink); transform: scale(1.03); }
-        .add-btn { width: 100%; background: #fff; color: #000; border: none; padding: 20px; border-radius: 40px; font-weight: 900; font-size: 16px; margin-top: 20px; cursor: pointer; transition: 0.1s; }
-        .add-btn:active { transform: scale(0.88); background: var(--pink); }
+        .p-btn { background: #1c1c1e; border: 1.5px solid #2c2c2e; padding: 15px; border-radius: 20px; color: #fff; font-size: 14px; font-weight: 600; cursor: pointer; text-align: center; transition: 0.1s; }
+        .p-btn.active { border-color: var(--pink); background: rgba(242, 162, 192, 0.2); color: var(--pink); transform: scale(1.05); }
+        
+        .add-btn { width: 100%; background: #fff; color: #000; border: none; padding: 20px; border-radius: 40px; font-weight: 900; font-size: 16px; margin-top: 20px; cursor: pointer; transition: 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .add-btn:active { transform: scale(0.8); background: var(--pink); box-shadow: 0 0 30px var(--pink); }
+        
         .list-container { width: 100%; max-width: 400px; padding-bottom: 50px; }
         h2 { font-size: 18px; font-weight: 900; margin: 40px 0 20px; padding-left: 10px; border-left: 4px solid var(--pink); }
+        
         .card { background: var(--card); border-radius: 30px; padding: 20px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #2c2c2e; }
-        .card.new-item-flash { animation: flash 2s infinite; }
-        @keyframes flash { 0% { border-color: #2c2c2e; } 50% { border-color: var(--pink); box-shadow: 0 0 15px rgba(242, 162, 192, 0.4); } 100% { border-color: #2c2c2e; } }
+        .card.new-item-flash { animation: flash-brilliant 1.5s ease-in-out 3; }
+        @keyframes flash-brilliant {
+            0% { border-color: #2c2c2e; transform: scale(1); }
+            50% { border-color: var(--pink); box-shadow: 0 0 25px rgba(242, 162, 192, 0.6); background: #222224; transform: scale(1.02); }
+            100% { border-color: #2c2c2e; transform: scale(1); }
+        }
+
         .card.is-done { opacity: 0.3; filter: grayscale(1); }
         .info h3 { margin: 0; font-size: 18px; font-weight: 800; }
         .info p { margin: 5px 0 0; font-size: 12px; color: var(--gray); }
@@ -97,7 +105,7 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
     let curP = null;
-    let recentlyId = null;
+    let recentlyAddedKey = null;
 
     function fVND(i) {
         let v = i.value.replace(/\D/g, "");
@@ -113,29 +121,39 @@
         const price = document.getElementById('itemPrice').value;
         const cate = document.getElementById('itemCate').value;
         const note = document.getElementById('itemNote').value;
-        if (!name || !curP) return alert("Bà chưa chọn đủ!");
-        const ref = db.ref('wishlist_v10').push();
-        recentlyId = ref.key;
+        if (!name || !curP) return alert("Chọn độ ưu tiên đã má!");
+
+        // HIỆU ỨNG BẮN ICON TUNG TÓE LẬP TỨC
+        confetti({ particleCount: 160, spread: 100, origin: { y: 0.6 }, shapes: [confetti.shapeFromText({ text: '💖', scalar: 3 })] });
+
+        const ref = db.ref('wishlist_v12').push();
+        recentlyAddedKey = ref.key;
+
         ref.set({ name, price: price || "0", cate, note, priority: curP, status: 'waiting', time: Date.now() }).then(() => {
-            confetti({ particleCount: 150, spread: 100, origin: { y: 0.6 }, shapes: [confetti.shapeFromText({ text: curP.lv === 6 ? '🔥' : '🎁', scalar: 3 })] });
+            // RESET CÁC MỤC LỰA CHỌN TRÊN FORM NGAY LẬP TỨC
             document.getElementById('itemName').value = "";
             document.getElementById('itemPrice').value = "";
             document.getElementById('itemNote').value = "";
             document.getElementById('itemCate').selectedIndex = 0;
             document.querySelectorAll('.p-btn').forEach(b => b.classList.remove('active'));
             curP = null;
+
+            // ĐỢI 1 CHÚT CHO DANH SÁCH CẬP NHẬT RỒI MỚI SCROLL
             setTimeout(() => {
-                const el = document.getElementById(recentlyId);
-                if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.classList.add('new-item-flash'); setTimeout(() => el.classList.remove('new-item-flash'), 4000); }
-            }, 500);
+                const el = document.getElementById(recentlyAddedKey);
+                if (el) {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    el.classList.add('new-item-flash');
+                }
+            }, 300);
         });
     }
     function toggleStatus(id, s) {
         const next = s === 'waiting' ? 'done' : 'waiting';
-        db.ref('wishlist_v10/' + id).update({ status: next });
-        if(next === 'done') confetti({ particleCount: 100, shapes: [confetti.shapeFromText({ text: '💃', scalar: 2 })], origin: { y: 0.7 } });
+        db.ref('wishlist_v12/' + id).update({ status: next });
+        if(next === 'done') confetti({ particleCount: 120, shapes: [confetti.shapeFromText({ text: '💃', scalar: 2 })], origin: { y: 0.8 } });
     }
-    db.ref('wishlist_v10').on('value', (snap) => {
+    db.ref('wishlist_v12').on('value', (snap) => {
         const aBox = document.getElementById('activeList');
         const dBox = document.getElementById('doneList');
         let aH = "", dH = "";
@@ -144,10 +162,10 @@
         items.sort((a, b) => b.priority.lv - a.priority.lv || b.time - a.time);
         items.forEach(i => {
             const isD = i.status === 'done';
-            const h = `<div class="card ${isD ? 'is-done' : ''}" id="${i.id}"><div class="info"><span class="badge p${i.priority.lv}">${i.priority.txt}</span><h3>${i.name}</h3><p>${i.cate} • 💰 ${i.price}đ</p>${i.note ? `<p class="note-txt">📝 ${i.note}</p>` : ''}</div><div class="actions"><button class="circle-btn" style="color:var(--green);border-color:var(--green)" onclick="toggleStatus('${i.id}', '${i.status}')">${isD ? '↩️' : '💃'}</button><button class="circle-btn" onclick="confirm('Xóa nha?') && db.ref('wishlist_v10/${i.id}').remove()">🗑️</button></div></div>`;
+            const h = `<div class="card ${isD ? 'is-done' : ''}" id="${i.id}"><div class="info"><span class="badge p${i.priority.lv}">${i.priority.txt}</span><h3>${i.name}</h3><p>${i.cate} • 💰 ${i.price}đ</p>${i.note ? `<p class="note-txt">📝 ${i.note}</p>` : ''}</div><div class="actions"><button class="circle-btn" style="color:var(--green);border-color:var(--green)" onclick="toggleStatus('${i.id}', '${i.status}')">${isD ? '↩️' : '💃'}</button><button class="circle-btn" onclick="confirm('Xóa nha?') && db.ref('wishlist_v12/${i.id}').remove()">🗑️</button></div></div>`;
             if(isD) dH += h; else aH += h;
         });
-        aBox.innerHTML = aH || "<p style='text-align:center;color:#333;font-size:12px;'>Đang chờ quà...</p>";
+        aBox.innerHTML = aH || "<p style='text-align:center;color:#333;font-size:12px;'>Đang chờ quà mới...</p>";
         dBox.innerHTML = dH || "<p style='text-align:center;color:#333;font-size:12px;'>Trống...</p>";
     });
 </script>
