@@ -3,148 +3,127 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wishlist & Foodlist 🫃🏻</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <title>Bòi Bói Boi - Done List 🫃🏻</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <style>
-        :root { --bg: #000; --card: #121212; --text: #fff; --gray: #888; --pink: #ff2d55; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; overflow-x: hidden; scroll-behavior: smooth; }
+        :root { --bg: #000; --pink: #ff2d55; --card: #1c1c1e; --gray: #8e8e93; --green: #34c759; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: #fff; margin: 0; padding: 0; overflow-x: hidden; scroll-behavior: smooth; }
         
-        .tab-menu { display: flex; justify-content: center; gap: 40px; padding: 20px 0; background: #000; position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid #222; }
-        .tab-link { color: var(--gray); font-weight: 800; cursor: pointer; font-size: 14px; text-transform: uppercase; transition: 0.3s; padding: 8px 0; }
-        .tab-link.active { color: var(--pink); border-bottom: 2px solid var(--pink); text-shadow: 0 0 10px var(--pink); }
+        .tab-menu { display: flex; justify-content: center; gap: 40px; padding: 20px 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(15px); position: sticky; top: 0; z-index: 1000; border-bottom: 0.5px solid #333; }
+        .tab-link { color: var(--gray); font-weight: 800; cursor: pointer; font-size: 13px; transition: 0.3s; }
+        .tab-link.active { color: var(--pink); border-bottom: 2px solid var(--pink); padding-bottom: 5px; }
 
-        .slider { display: flex; width: 200vw; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .slider { display: flex; width: 200vw; transition: transform 0.4s ease; }
         .sheet { width: 100vw; padding: 20px; box-sizing: border-box; min-height: 100vh; }
 
-        h1 { font-weight: 800; font-size: 24px; text-align: center; color: #ff85a2; margin: 0; }
-        .sub { text-align: center; font-size: 10px; color: var(--gray); letter-spacing: 1px; margin-bottom: 25px; text-transform: uppercase; }
+        .input-card { background: var(--card); padding: 20px; border-radius: 24px; border: 1px solid #333; margin-bottom: 30px; }
+        input { width: 100%; background: #2c2c2e; border: 1px solid #3a3a3c; border-radius: 12px; padding: 14px; color: #fff; margin-bottom: 10px; outline: none; box-sizing: border-box; font-size: 16px; }
         
-        .input-card { background: var(--card); padding: 20px; border-radius: 25px; margin-bottom: 30px; border: 1px solid #222; position: relative; overflow: hidden; }
-        label { font-size: 10px; font-weight: 800; color: var(--gray); display: block; margin-bottom: 8px; }
-        input, textarea, select { width: 100%; background: #1a1a1a; border: 1px solid #222; border-radius: 12px; padding: 12px; color: white; margin-bottom: 15px; outline: none; font-family: inherit; box-sizing: border-box; font-size: 14px; }
-        input:focus { border-color: var(--pink); }
+        .p-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px; }
+        .p-btn { background: #2c2c2e; border: 1px solid #3a3a3c; padding: 12px; border-radius: 12px; color: var(--gray); font-weight: 600; cursor: pointer; }
+        .p-btn.active { border-color: var(--pink); color: #fff; background: rgba(255, 45, 85, 0.2); }
 
-        .row { display: flex; gap: 10px; }
-        .priority-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px; }
+        .add-btn { width: 100%; background: #fff; color: #000; border: none; padding: 18px; border-radius: 40px; font-weight: 900; font-size: 16px; cursor: pointer; }
         
-        .p-btn { background: #1a1a1a; border: 1px solid #222; padding: 12px; border-radius: 12px; color: var(--gray); text-align: center; cursor: pointer; font-weight: 600; transition: 0.2s; }
-        .p-btn.active { border-color: var(--pink) !important; color: white !important; background: rgba(255, 45, 85, 0.3) !important; box-shadow: 0 0 20px rgba(255, 45, 85, 0.4); transform: scale(1.02); }
+        h2 { font-size: 18px; font-weight: 900; margin: 30px 0 15px; padding-left: 10px; border-left: 4px solid var(--pink); }
+        .done-title { border-left-color: var(--green); color: var(--green); opacity: 0.8; }
 
-        .add-btn { width: 100%; background: #fff; color: #000; border: none; padding: 18px; border-radius: 40px; font-weight: 800; font-size: 16px; cursor: pointer; transition: 0.3s; }
-        .add-btn:active { transform: scale(0.95); background: var(--pink); color: white; }
+        .item { background: var(--card); padding: 16px; border-radius: 20px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border-left: 6px solid #333; transition: 0.3s; }
+        .item.is-done { opacity: 0.4; filter: grayscale(0.8); border-left-color: var(--green) !important; }
         
-        h2 { font-size: 18px; font-weight: 800; margin: 30px 0 15px 0; color: #fff; border-left: 4px solid var(--pink); padding-left: 10px; }
-        
-        .item { background: var(--card); padding: 15px; border-radius: 20px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; border-left: 6px solid #333; animation: popIn 0.3s ease-out; }
-        @keyframes popIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
-        
-        .item.done { opacity: 0.3; filter: grayscale(1); }
-        .badge { font-size: 9px; padding: 4px 10px; border-radius: 6px; color: white; display: inline-block; margin-bottom: 8px; font-weight: bold; text-transform: uppercase; }
-        .btn-circle { width: 45px; height: 45px; border-radius: 50%; border: none; background: #222; color: white; cursor: pointer; font-size: 18px; margin-bottom: 5px; transition: 0.2s; }
-        .btn-circle:active { background: var(--pink); }
+        .badge { font-size: 9px; padding: 3px 8px; border-radius: 6px; color: #fff; font-weight: 800; margin-bottom: 5px; display: inline-block; }
+        .actions { display: flex; gap: 8px; }
+        .btn-circle { width: 40px; height: 40px; border-radius: 50%; border: none; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; background: #2c2c2e; }
+        .btn-done { color: var(--green); border: 1px solid var(--green); }
 
-        .img-box { width: 80px; height: 80px; background: #1a1a1a; border-radius: 15px; border: 1px dashed #444; display: flex; align-items: center; justify-content: center; overflow: hidden; margin-bottom: 15px; cursor: pointer; position: relative; }
-        .img-box img { width: 100%; height: 100%; object-fit: cover; }
+        .img-preview { width: 80px; height: 80px; background: #2c2c2e; border-radius: 12px; border: 1px dashed #444; display: flex; align-items: center; justify-content: center; overflow: hidden; margin-bottom: 15px; }
+        .img-preview img { width: 100%; height: 100%; object-fit: cover; }
     </style>
 </head>
 <body>
 
 <div class="tab-menu">
-    <div class="tab-link active" onclick="goTab(0, this)">🎁 Wishlist</div>
-    <div class="tab-link" onclick="goTab(1, this)">🍜 Food List</div>
+    <div class="tab-link active" onclick="go(0, this)">🎁 QUÀ TẶNG</div>
+    <div class="tab-link" onclick="go(1, this)">🍜 ĂN UỐNG</div>
 </div>
 
-<div class="slider" id="mainSlider">
-    <div class="sheet" id="sheet1">
-        <h1>Wishlist của Bòi Bói Boi 🫃🏻</h1>
-        <p class="sub">THÊM MÓN QUÀ ANH THÍCH VÀO ĐÂY NHOÉ 💌</p>
+<div class="slider" id="slider">
+    <div class="sheet">
         <div class="input-card">
-            <label>❤️ TÊN QUÀ TẶNG</label>
-            <input type="text" id="n1" placeholder="Ví dụ: iPhone 16...">
-            <div class="row">
-                <div style="flex:1"><label>📂 DANH MỤC</label><select id="c1"><option>💕 Lãng Mạn</option><option>👕 Thời Trang</option><option>💻 Công Nghệ</option><option>⚽ Thể Thao</option></select></div>
-                <div style="flex:1"><label>$ GIÁ</label><input type="text" id="p1" placeholder="0" onkeyup="fmt(this)"></div>
+            <input type="text" id="n1" placeholder="Tên món quà ước mơ...">
+            <input type="text" id="p1" placeholder="Giá tiền..." onkeyup="fVN(this)">
+            <div class="p-group">
+                <button class="p-btn" onclick="setP(5, this)">🔥 PHẢI CÓ</button>
+                <button class="p-btn" onclick="setP(2, this)">💖 THÍCH</button>
             </div>
-            <label>🔥 ĐỘ ƯU TIÊN</label>
-            <div class="priority-group">
-                <button class="p-btn" onclick="selP(5, this)">🔥 PHẢI CÓ (GẤP)</button>
-                <button class="p-btn" onclick="selP(4, this)">💖 Cần lắm luôn</button>
-                <button class="p-btn" onclick="selP(3, this)">🥺 Đang mơ về em</button>
-                <button class="p-btn" onclick="selP(2, this)">🌷 Thích nha nha</button>
-                <button class="p-btn" onclick="selP(1, this)">💬 Nhìn cũng hay</button>
-            </div>
-            <textarea id="nt1" placeholder="Ghi chú màu sắc, size..."></textarea>
-            <button class="add-btn" onclick="saveData('gifts')">🚀 THÊM VÀO WISHLIST</button>
+            <button class="add-btn" onclick="save('gifts')">✨ THÊM VÀO ƯỚC MƠ</button>
         </div>
-        <h2 id="target1">Danh mục ước mơ 🦋</h2>
-        <div id="list1"></div>
+        <h2 id="anc1">🔥 ĐANG CHỜ HỐT</h2>
+        <div id="list1-active"></div>
+        <h2 class="done-title">💃 ĐÃ VỀ DINH</h2>
+        <div id="list1-done"></div>
     </div>
 
-    <div class="sheet" id="sheet2">
-        <h1>Thèm Ăn Quá À 🤤</h1>
-        <p class="sub">CHỌN MÓN ĐI ĂN CÙNG NHAU NÈ 🍤</p>
+    <div class="sheet">
         <div class="input-card">
-            <label>🍜 TÊN MÓN ĂN</label>
-            <input type="text" id="n2" placeholder="Ví dụ: Lẩu cá tầm...">
-            <label>🖼️ ẢNH MÓN ĂN</label>
-            <div class="img-box" onclick="document.getElementById('fInp').click()">
-                <img id="pImg" style="display:none"> <span id="pTxt" style="font-size: 10px; color: #666;">+ THÊM ẢNH</span>
+            <input type="text" id="n2" placeholder="Tên món thèm ăn...">
+            <div class="img-preview" onclick="document.getElementById('fInp').click()">
+                <img id="pImg" style="display:none"> <span id="pTxt" style="font-size:10px">+ ẢNH</span>
             </div>
             <input type="file" id="fInp" hidden accept="image/*" onchange="readImg(this)">
-            <div class="row">
-                <div style="flex:1"><label>📂 LOẠI HÌNH</label><select id="c2"><option>🍲 Lẩu/Nướng</option><option>🍣 Nhật/Hàn</option><option>🍰 Tráng miệng</option><option>☕ Cà phê</option></select></div>
-                <div style="flex:1"><label>$ GIÁ DỰ KIẾN</label><input type="text" id="p2" placeholder="0" onkeyup="fmt(this)"></div>
+            <input type="text" id="p2" placeholder="Giá dự kiến..." onkeyup="fVN(this)">
+            <div class="p-group">
+                <button class="p-btn" onclick="setP(5, this)">🔥 PHẢI ĂN</button>
+                <button class="p-btn" onclick="setP(2, this)">😋 THÈM</button>
             </div>
-            <label>🔥 ĐỘ THÈM</label>
-            <div class="priority-group">
-                <button class="p-btn" onclick="selP(5, this)">🔥 PHẢI ĂN NGAY</button>
-                <button class="p-btn" onclick="selP(2, this)">😋 Hơi hơi thèm</button>
-            </div>
-            <button class="add-btn" onclick="saveData('foods')">📡 BẮN TÍN HIỆU</button>
+            <button class="add-btn" onclick="save('foods')">🤤 CHỐT ĐƠN</button>
         </div>
-        <h2 id="target2">Danh sách thèm thuồng 🍤</h2>
-        <div id="list2"></div>
+        <h2 id="anc2">🍤 ĐANG THÈM THUỒNG</h2>
+        <div id="list2-active"></div>
+        <h2 class="done-title">✅ ĐÃ CHÉN XONG</h2>
+        <div id="list2-done"></div>
     </div>
 </div>
 
 <script>
-    var firebaseConfig = {
+    const conf = {
         apiKey: "AIzaSyAiOpChueDkBODGKessbTvHDS-YOxeSsHE",
-        authDomain: "wishlist-c5669.firebaseapp.com",
-        databaseURL: "https://wishlist-c5669-default-rtdb.asia-southeast1.firebasedatabase.app",
-        projectId: "wishlist-c5669",
-        storageBucket: "wishlist-c5669.firebasestorage.app",
-        messagingSenderId: "821194575297",
-        appId: "1:821194575297:web:185b7837e6cdee4783f340"
+  authDomain: "wishlist-c5669.firebaseapp.com",
+  databaseURL: "https://wishlist-c5669-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "wishlist-c5669",
+  storageBucket: "wishlist-c5669.firebasestorage.app",
+  messagingSenderId: "821194575297",
+  appId: "1:821194575297:web:185b7837e6cdee4783f340",
+  measurementId: "G-RHE1QBW9WX"
     };
-    
-    firebase.initializeApp(firebaseConfig);
-    var db = firebase.database();
+    firebase.initializeApp(conf);
+    const db = firebase.database();
+    let curP = null, curImg = "";
 
-    var curP = null;
-    var curImg = "";
-    var clrs = { 5: "#ff4d4d", 4: "#ff85a2", 3: "#ffd93d", 2: "#6BCB77", 1: "#4D96FF" };
-
-    function goTab(i, btn) {
-        document.getElementById('mainSlider').style.transform = "translateX(-" + (i * 100) + "vw)";
-        document.querySelectorAll('.tab-link').forEach(function(t) { t.classList.remove('active'); });
-        btn.classList.add('active');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+    function go(idx, b) {
+        document.getElementById('slider').style.transform = `translateX(-${idx * 100}vw)`;
+        document.querySelectorAll('.tab-link').forEach(t => t.classList.remove('active'));
+        b.classList.add('active');
     }
 
-    function selP(lv, btn) {
-        btn.parentElement.querySelectorAll('.p-btn').forEach(function(b) { b.classList.remove('active'); });
-        btn.classList.add('active');
-        curP = { lv: lv, txt: btn.innerText, clr: clrs[lv] };
+    function setP(lv, b) {
+        b.parentElement.querySelectorAll('.p-btn').forEach(x => x.classList.remove('active'));
+        b.classList.add('active');
+        curP = { lv: lv, txt: b.innerText, clr: lv==5?'#ff3b30':'#ffcc00' };
+    }
+
+    function fVN(i) {
+        let v = i.value.replace(/\D/g, "");
+        i.value = v.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     }
 
     function readImg(input) {
         if (input.files && input.files[0]) {
-            var r = new FileReader();
-            r.onload = function(e) {
+            const r = new FileReader();
+            r.onload = (e) => {
                 document.getElementById('pImg').src = e.target.result;
                 document.getElementById('pImg').style.display = 'block';
                 document.getElementById('pTxt').style.display = 'none';
@@ -154,103 +133,67 @@
         }
     }
 
-    function fmt(i) {
-        var v = i.value.replace(/\D/g, "");
-        i.value = v.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    }
+    function save(path) {
+        const isG = path === 'gifts';
+        const name = document.getElementById(isG ? 'n1' : 'n2').value;
+        if (!name || !curP) return alert("Nhập đủ thông tin bà ơi!");
 
-    function bang(icons) {
-        icons.forEach(function(ic, i) {
-            setTimeout(function() {
-                confetti({ 
-                    particleCount: 50, spread: 80, origin: { y: 0.7 }, 
-                    shapes: [confetti.shapeFromText({ text: ic, scalar: 2 })] 
-                });
-            }, i * 150);
-        });
-    }
-
-    function saveData(path) {
-        var isG = (path === 'gifts');
-        var name = document.getElementById(isG ? 'n1' : 'n2').value;
-        var price = document.getElementById(isG ? 'p1' : 'p2').value;
-        var cate = document.getElementById(isG ? 'c1' : 'c2').value;
-        var note = isG ? document.getElementById('nt1').value : "";
-
-        if (!name || !curP) return alert("Bà nhập tên và chọn độ ưu tiên kìa!");
-
-        // 1. BẮN HIỆU ỨNG NGAY LẬP TỨC
-        bang(isG ? ['🎁','💖','💎'] : ['🍣','🍲','🔥']);
-
-        // 2. LƯU VÀO FIREBASE
         db.ref(path).push({
-            name: name, price: price || "0", cate: cate, p: curP, note: note,
-            img: isG ? "" : curImg, status: 'wait', time: Date.now()
+            name, price: document.getElementById(isG ? 'p1' : 'p2').value || "0",
+            p: curP, img: isG ? "" : curImg, status: 'active', time: Date.now()
+        }).then(() => {
+            confetti({ particleCount: 100, spread: 70, origin: { y: 0.8 } });
+            document.getElementById(isG ? 'n1' : 'n2').value = "";
+            document.getElementById(isG ? 'p1' : 'p2').value = "";
+            curP = null; curImg = "";
+            document.querySelectorAll('.p-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('pImg').style.display='none';
+            document.getElementById('pTxt').style.display='block';
         });
-
-        // 3. RESET FORM CHỚP NHOÁNG
-        document.getElementById(isG ? 'n1' : 'n2').value = "";
-        document.getElementById(isG ? 'p1' : 'p2').value = "";
-        if (!isG) { 
-            document.getElementById('pImg').style.display='none'; 
-            document.getElementById('pTxt').style.display='block'; 
-            curImg=""; 
-        }
-        document.querySelectorAll('.p-btn').forEach(function(b) { b.classList.remove('active'); });
-        curP = null;
-
-        // 4. SCROLL XUỐNG DANH SÁCH LIỀN
-        var target = document.getElementById(isG ? 'target1' : 'target2');
-        window.scrollTo({ top: target.offsetTop - 80, behavior: 'smooth' });
     }
 
-    function upd(path, id, s) {
-        db.ref(path + '/' + id).update({ status: (s === 'done' ? 'wait' : 'done') });
+    function toggleStatus(path, id, currentStatus) {
+        const newStatus = currentStatus === 'active' ? 'done' : 'active';
+        db.ref(`${path}/${id}`).update({ status: newStatus });
+        if(newStatus === 'done') confetti({ particleCount: 50, colors: ['#34c759'] });
     }
 
-    function del(path, id) {
-        if(confirm("Xoá thiệt hả bà?")) db.ref(path + '/' + id).remove();
-    }
+    function render(path, activeId, doneId) {
+        db.ref(path).on('value', (snap) => {
+            const activeCont = document.getElementById(activeId);
+            const doneCont = document.getElementById(doneId);
+            let activeHtml = "", doneHtml = "";
+            const items = [];
+            
+            snap.forEach(c => { items.push({id: c.key, ...c.val()}); });
+            items.sort((a, b) => b.p.lv - a.p.lv || b.time - a.time);
 
-    function render(path, targetId) {
-        db.ref(path).on('value', function(snap) {
-            var listDiv = document.getElementById(targetId);
-            var data = [];
-            snap.forEach(function(child) {
-                var item = child.val();
-                item.id = child.key;
-                data.push(item);
-            });
-
-            // SORT: ĐỘ ƯU TIÊN CAO LÊN TRƯỚC
-            data.sort(function(a, b) { return b.p.lv - a.p.lv; });
-
-            if (data.length === 0) {
-                listDiv.innerHTML = '<p style="text-align:center; color:#333; font-size:12px;">Chưa có gì hết bà ơi...</p>';
-                return;
-            }
-
-            listDiv.innerHTML = data.map(function(i) {
-                return `
-                <div class="item ${i.status === 'done' ? 'done' : ''}" style="border-left-color:${i.p.clr}">
-                    <div style="flex:1; padding-right:10px;">
+            items.forEach(i => {
+                const html = `
+                <div class="item ${i.status === 'done' ? 'is-done' : ''}" style="border-left-color:${i.p.clr}">
+                    <div style="flex:1">
                         <span class="badge" style="background:${i.p.clr}">${i.p.txt}</span>
-                        ${i.img ? `<img src="${i.img}" style="width:100%; max-width:180px; border-radius:15px; display:block; margin:10px 0; border:1px solid #222;">` : ''}
-                        <h3 style="margin:5px 0; font-size:16px; color:#fff;">${i.name}</h3>
-                        <p style="font-size:12px; color:#888;">${i.price}đ • ${i.cate}</p>
-                        ${i.note ? `<p style="font-size:11px; color:#ff85a2; margin-top:5px; background:rgba(255,133,162,0.1); padding:5px; border-radius:8px;">📝 ${i.note}</p>` : ''}
+                        ${i.img ? `<img src="${i.img}" style="width:70px; border-radius:10px; display:block; margin:5px 0;">` : ''}
+                        <h3 style="margin:5px 0; font-size:16px;">${i.name}</h3>
+                        <p style="font-size:12px; color:var(--gray);">${i.price}đ</p>
                     </div>
-                    <div style="display:flex; flex-direction:column; gap:8px;">
-                        <button class="btn-circle" onclick="upd('${path}','${i.id}','${i.status}')">${path==='foods'?'✅':'💃'}</button>
-                        <button class="btn-circle" onclick="del('${path}','${i.id}')" style="background:#1a1a1a; color:#444;">🗑️</button>
+                    <div class="actions">
+                        <button class="btn-circle btn-done" onclick="toggleStatus('${path}','${i.id}','${i.status}')">
+                            ${i.status === 'active' ? (path==='gifts'?'💃':'✅') : '↩️'}
+                        </button>
+                        <button class="btn-circle" onclick="db.ref('${path}/${i.id}').remove()">🗑️</button>
                     </div>
                 </div>`;
-            }).join('');
+                if(i.status === 'active') activeHtml += html; else doneHtml += html;
+            });
+
+            activeCont.innerHTML = activeHtml || "<p style='font-size:12px;color:#333;text-align:center'>Trống trơn...</p>";
+            doneCont.innerHTML = doneHtml || "<p style='font-size:12px;color:#333;text-align:center'>Chưa hoàn thành món nào...</p>";
         });
     }
 
-    render('gifts', 'list1');
-    render('foods', 'list2');
+    render('gifts', 'list1-active', 'list1-done');
+    render('foods', 'list2-active', 'list2-done');
 </script>
 </body>
 </html>
