@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Wishlist Final 🧞‍♀️</title>
+    <title>Wishlist Perfect Final 🧞‍♀️</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -16,15 +16,16 @@
         
         .form-box { width: 100%; max-width: 400px; background: var(--card); border-radius: 35px; padding: 25px; box-sizing: border-box; border: 1px solid #2c2c2e; margin-bottom: 20px; }
         label { font-size: 11px; font-weight: 700; color: var(--gray); margin-bottom: 10px; display: block; text-transform: uppercase; }
-        input, .select-wrapper select { width: 100%; background: #1c1c1e; border: 1.5px solid #2c2c2e; border-radius: 15px; padding: 16px; color: #fff; font-size: 16px; margin-bottom: 20px; outline: none; box-sizing: border-box; appearance: none; }
-        .select-wrapper::after { content: '▼'; font-size: 10px; color: var(--pink); position: absolute; right: 15px; top: 22px; pointer-events: none; }
+        input, .select-wrapper select, textarea { width: 100%; background: #1c1c1e; border: 1.5px solid #2c2c2e; border-radius: 15px; padding: 16px; color: #fff; font-size: 16px; margin-bottom: 20px; outline: none; box-sizing: border-box; appearance: none; font-family: inherit; }
+        textarea { height: 80px; resize: none; }
+        
         .select-wrapper { position: relative; }
+        .select-wrapper::after { content: '▼'; font-size: 10px; color: var(--pink); position: absolute; right: 15px; top: 22px; pointer-events: none; }
         .row { display: grid; grid-template-columns: 1.2fr 1fr; gap: 10px; }
         
-        /* Đảo thứ tự nút: Phải có lên đầu */
         .p-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px; }
         .p-btn { background: #1c1c1e; border: 1.5px solid #2c2c2e; padding: 15px; border-radius: 20px; color: #fff; font-size: 14px; font-weight: 600; cursor: pointer; text-align: center; transition: 0.2s; }
-        .p-btn.active { border-color: var(--pink); background: rgba(242, 162, 192, 0.1); color: var(--pink); transform: scale(1.05); }
+        .p-btn.active { border-color: var(--pink); background: rgba(242, 162, 192, 0.1); color: var(--pink); transform: scale(1.03); }
         
         .add-btn { width: 100%; background: #fff; color: #000; border: none; padding: 20px; border-radius: 40px; font-weight: 900; font-size: 16px; margin-top: 20px; cursor: pointer; transition: 0.2s; }
         .add-btn:active { transform: scale(0.92); background: var(--pink); }
@@ -33,7 +34,6 @@
         h2 { font-size: 18px; font-weight: 900; margin: 40px 0 20px; padding-left: 10px; border-left: 4px solid var(--pink); }
         
         .card { background: var(--card); border-radius: 30px; padding: 20px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #2c2c2e; transition: 0.5s; }
-        /* Hiệu ứng sáng lên khi thêm món mới */
         .card.new-item { animation: highlight 2s ease-out; }
         @keyframes highlight {
             0% { border-color: var(--pink); box-shadow: 0 0 20px rgba(242, 162, 192, 0.4); transform: scale(1.05); }
@@ -43,9 +43,9 @@
         .card.is-done { opacity: 0.3; filter: grayscale(1); }
         .info h3 { margin: 0; font-size: 18px; font-weight: 800; }
         .info p { margin: 5px 0 0; font-size: 12px; color: var(--gray); }
-        .badge { font-size: 9px; padding: 4px 12px; border-radius: 12px; font-weight: 800; margin-bottom: 8px; display: inline-block; }
+        .info .note-text { font-style: italic; color: var(--pink); font-size: 11px; margin-top: 4px; }
         
-        /* 5 màu badge khác nhau */
+        .badge { font-size: 9px; padding: 4px 12px; border-radius: 12px; font-weight: 800; margin-bottom: 8px; display: inline-block; }
         .p6 { background: rgba(255, 59, 48, 0.2); color: #ff3b30; } 
         .p5 { background: rgba(255, 159, 10, 0.2); color: #ff9f0a; } 
         .p4 { background: rgba(48, 209, 88, 0.2); color: #30d158; } 
@@ -78,6 +78,9 @@
                 <input type="text" id="itemPrice" placeholder="0" onkeyup="fVND(this)">
             </div>
         </div>
+        <label>📝 GHI CHÚ</label>
+        <textarea id="itemNote" placeholder="Màu sắc, kích cỡ, địa chỉ..."></textarea>
+        
         <label>🔥 ĐỘ ƯU TIÊN</label>
         <div class="p-group">
             <div class="p-btn" onclick="selP(6, this, '🔥 PHẢI CÓ')">🔥 PHẢI CÓ</div>
@@ -98,7 +101,7 @@
 
 <script>
     const firebaseConfig = {
-       apiKey: "AIzaSyAiOpChueDkBODGKessbTvHDS-YOxeSsHE",
+        apiKey: "AIzaSyAiOpChueDkBODGKessbTvHDS-YOxeSsHE",
   authDomain: "wishlist-c5669.firebaseapp.com",
   databaseURL: "https://wishlist-c5669-default-rtdb.asia-southeast1.firebasedatabase.app",
   projectId: "wishlist-c5669",
@@ -123,31 +126,26 @@
         curP = { lv, txt };
     }
 
-    function resetForm() {
-        document.getElementById('itemName').value = "";
-        document.getElementById('itemPrice').value = "";
-        document.getElementById('itemCate').selectedIndex = 0;
-        document.querySelectorAll('.p-btn').forEach(b => b.classList.remove('active'));
-        curP = null;
-    }
-
     function sendData() {
         const name = document.getElementById('itemName').value;
         const price = document.getElementById('itemPrice').value;
         const cate = document.getElementById('itemCate').value;
-        if (!name || !curP) return alert("Chọn độ ưu tiên đã má!");
+        const note = document.getElementById('itemNote').value;
+        if (!name || !curP) return alert("Bà chọn độ ưu tiên đi!");
 
-        const ref = db.ref('wishlist_final_v7').push();
+        const ref = db.ref('wishlist_final_v8').push();
         lastId = ref.key;
 
-        ref.set({ name, price: price || "0", cate, priority: curP, status: 'waiting', time: Date.now() }).then(() => {
-            // Bắn icon ngay tâm
-            confetti({ 
-                shapes: [confetti.shapeFromText({ text: curP.lv === 6 ? '🔥' : '💖', scalar: 2.5 })], 
-                particleCount: 100, spread: 70, origin: { y: 0.6 } 
-            });
-
-            resetForm(); // RESET NGAY LẬP TỨC
+        ref.set({ name, price: price || "0", cate, note, priority: curP, status: 'waiting', time: Date.now() }).then(() => {
+            confetti({ shapes: [confetti.shapeFromText({ text: curP.lv === 6 ? '🔥' : '💖', scalar: 2.5 })], particleCount: 100, spread: 70, origin: { y: 0.6 } });
+            
+            // RESET NGAY LẬP TỨC
+            document.getElementById('itemName').value = "";
+            document.getElementById('itemPrice').value = "";
+            document.getElementById('itemNote').value = "";
+            document.getElementById('itemCate').selectedIndex = 0;
+            document.querySelectorAll('.p-btn').forEach(b => b.classList.remove('active'));
+            curP = null;
 
             setTimeout(() => {
                 const el = document.getElementById(lastId);
@@ -161,18 +159,16 @@
 
     function toggleStatus(id, s) {
         const next = s === 'waiting' ? 'done' : 'waiting';
-        db.ref('wishlist_final_v7/' + id).update({ status: next });
+        db.ref('wishlist_final_v8/' + id).update({ status: next });
         if(next === 'done') confetti({ particleCount: 100, shapes: [confetti.shapeFromText({ text: '💃', scalar: 2 })], origin: { y: 0.8 } });
     }
 
-    db.ref('wishlist_final_v7').on('value', (snap) => {
+    db.ref('wishlist_final_v8').on('value', (snap) => {
         const aBox = document.getElementById('activeList');
         const dBox = document.getElementById('doneList');
         let aH = "", dH = "";
         const items = [];
         snap.forEach(c => { items.push({id: c.key, ...c.val()}); });
-        
-        // Sort: Phải có (6) -> FOMO (2)
         items.sort((a, b) => b.priority.lv - a.priority.lv || b.time - a.time);
 
         items.forEach(i => {
@@ -183,10 +179,11 @@
                         <span class="badge p${i.priority.lv}">${i.priority.txt}</span>
                         <h3>${i.name}</h3>
                         <p>${i.cate} • 💰 ${i.price}đ</p>
+                        ${i.note ? `<p class="note-text">📝 ${i.note}</p>` : ''}
                     </div>
                     <div class="actions">
                         <button class="circle-btn" style="color:var(--green);border-color:var(--green)" onclick="toggleStatus('${i.id}', '${i.status}')">${isD ? '↩️' : '💃'}</button>
-                        <button class="circle-btn" onclick="confirm('Xoá nha bà?') && db.ref('wishlist_final_v7/${i.id}').remove()">🗑️</button>
+                        <button class="circle-btn" onclick="confirm('Xoá nha bà?') && db.ref('wishlist_final_v8/${i.id}').remove()">🗑️</button>
                     </div>
                 </div>`;
             if(isD) dH += html; else aH += html;
@@ -197,3 +194,4 @@
 </script>
 </body>
 </html>
+
