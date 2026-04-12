@@ -14,7 +14,7 @@
         .tab-link.active { color: var(--pink); border-bottom: 2px solid var(--pink); }
         .slider { display: flex; width: 200vw; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .sheet { width: 100vw; padding: 20px; box-sizing: border-box; min-height: 100vh; }
-        h1 { font-weight: 800; font-size: 26px; text-align: center; margin-bottom: 5px; color: #ff85a2; }
+        h1 { font-weight: 800; font-size: 26px; text-align: center; margin: 0; color: #ff85a2; }
         .sub { text-align: center; font-size: 10px; color: var(--gray); letter-spacing: 1px; margin-bottom: 30px; text-transform: uppercase; }
         .input-card { background: var(--card); padding: 20px; border-radius: 25px; margin-bottom: 30px; border: 1px solid #222; }
         label { font-size: 10px; font-weight: 600; color: var(--gray); display: block; margin-bottom: 8px; }
@@ -24,12 +24,12 @@
         .select-wrapper::after { content: '⌵'; position: absolute; right: 15px; top: 50%; transform: translateY(-30%); color: var(--gray); pointer-events: none; font-size: 18px; }
         .row { display: flex; gap: 10px; }
         .priority-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px; }
-        .p-btn { background: #1a1a1a; border: 1px solid #222; padding: 14px; border-radius: 12px; color: var(--gray); text-align: center; cursor: pointer; transition: 0.3s; font-weight: 600; }
+        .p-btn { background: #1a1a1a; border: 1px solid #222; padding: 14px; border-radius: 12px; color: var(--gray); text-align: center; cursor: pointer; transition: 0.3s; font-weight: 600; border: 1px solid #222; }
         .p-btn.active { border-color: var(--pink); color: white; background: rgba(255, 45, 85, 0.1); box-shadow: 0 0 15px var(--pink); }
         .add-btn { width: 100%; background: #fff; color: #000; border: none; padding: 18px; border-radius: 40px; font-weight: 800; font-size: 16px; cursor: pointer; }
-        .item { background: var(--card); padding: 20px; border-radius: 25px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; transition: 0.5s; border-left: 6px solid #333; }
-        .item.highlight-new { animation: bFlash 1.5s ease; border: 2px solid var(--pink); }
-        @keyframes bFlash { 0% { transform: scale(0.8); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }
+        .item { background: var(--card); padding: 20px; border-radius: 25px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; border-left: 6px solid #333; transition: 0.3s; }
+        .item.new-item { animation: bounceFlash 1s ease-out; border-color: var(--pink); }
+        @keyframes bounceFlash { 0% { transform: scale(0.9); } 50% { transform: scale(1.03); } 100% { transform: scale(1); } }
         .item.done { opacity: 0.3; filter: grayscale(1); }
         .badge { font-size: 9px; padding: 3px 8px; border-radius: 6px; color: white; display: inline-block; margin-bottom: 5px; font-weight: bold; }
         .btn-circle { width: 45px; height: 45px; border-radius: 50%; border: none; background: #222; color: white; cursor: pointer; font-size: 18px; margin-bottom: 5px; }
@@ -67,15 +67,15 @@
             </div>
             <label>📝 GHI CHÚ</label>
             <textarea id="nt1" placeholder="Màu sắc, kích thước..."></textarea>
-            <button class="add-btn" onclick="handleSave('gifts')">🚀 THÊM VÀO WISHLIST</button>
+            <button class="add-btn" onclick="save('gifts')">🚀 THÊM VÀO WISHLIST</button>
         </div>
-        <h2 id="h1">Danh sách ước mơ 🦋</h2>
+        <h2 id="head1">Danh sách ước mơ 🦋</h2>
         <div id="list1"></div>
     </div>
 
     <div class="sheet">
         <h1>Thèm Ăn Quá À 🤤</h1>
-        <p class="sub">THÊM MÓN MUỐN ĐI ĂN CÙNG NHAU NÈ 🍤</p>
+        <p class="sub">CHỌN MÓN ĐI ĂN CÙNG NHAU NÈ 🍤</p>
         <div class="input-card">
             <label>🍜 TÊN MÓN ĂN</label>
             <input type="text" id="n2" placeholder="Tên món ăn...">
@@ -94,25 +94,29 @@
                 <button class="p-btn" data-l="5">🔥 PHẢI ĂN</button>
                 <button class="p-btn" data-l="2">😋 Thèm thèm</button>
             </div>
-            <button class="add-btn" onclick="handleSave('foods')">📡 BẮN TÍN HIỆU</button>
+            <button class="add-btn" onclick="save('foods')">📡 BẮN TÍN HIỆU</button>
         </div>
-        <h2 id="h2">Danh sách thèm thuồng 🍤</h2>
+        <h2 id="head2">Danh sách thèm thuồng 🍤</h2>
         <div id="list2"></div>
     </div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js";
-    import { getDatabase, ref, push, onValue, remove, update } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js";
+    import { getDatabase, ref, push, onValue, remove, update } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-database.app.js";
 
-    const firebaseConfig = { apiKey: "AIzaSyAiOpChueDkBODGKessbTvHDS-YOxeSsHE",
-  authDomain: "wishlist-c5669.firebaseapp.com",
-  databaseURL: "https://wishlist-c5669-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "wishlist-c5669",
-  storageBucket: "wishlist-c5669.firebasestorage.app",
-  messagingSenderId: "821194575297",
-  appId: "1:821194575297:web:185b7837e6cdee4783f340",
-  measurementId: "G-RHE1QBW9WX" };
+    // Đã dán Config của bà vô đây
+    const firebaseConfig = {
+        apiKey: "AIzaSyAiOpChueDkBODGKessbTvHDS-YOxeSsHE",
+        authDomain: "wishlist-c5669.firebaseapp.com",
+        databaseURL: "https://wishlist-c5669-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "wishlist-c5669",
+        storageBucket: "wishlist-c5669.firebasestorage.app",
+        messagingSenderId: "821194575297",
+        appId: "1:821194575297:web:185b7837e6cdee4783f340",
+        measurementId: "G-RHE1QBW9WX"
+    };
+
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
@@ -145,63 +149,65 @@
 
     window.fmt = (i) => { i.value = i.value.replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ","); };
 
-    window.handleSave = (path) => {
+    window.save = (path) => {
         const isG = path === 'gifts';
-        const name = document.getElementById(isG ? 'n1' : 'n2').value;
-        const price = document.getElementById(isG ? 'p1' : 'p2').value;
-        const cate = document.getElementById(isG ? 'c1' : 'c2').value;
-        const note = isG ? document.getElementById('nt1').value : "";
+        const n = document.getElementById(isG ? 'n1' : 'n2').value;
+        const p = document.getElementById(isG ? 'p1' : 'p2').value;
+        const c = document.getElementById(isG ? 'c1' : 'c2').value;
+        const nt = isG ? document.getElementById('nt1').value : "";
 
-        if(!name) return alert("Nhập tên cái đã má!");
-        if(!curP) return alert("Chọn độ ưu tiên/độ thèm dùm con cái!");
+        if(!n || !curP) return alert("Nhập tên và chọn Độ ưu tiên nha má!");
 
         push(ref(db, path), {
-            name, price: price || "0", cate, p: curP, note, img: isG ? "" : curImg, status: 'wait', time: Date.now()
+            name: n, price: p || "0", cate: c, p: curP, note: nt, img: isG ? "" : curImg, status: 'wait', time: Date.now()
         }).then((res) => {
             lastId = res.key;
             const ics = isG ? ['🎁','💖','✨'] : ['🍱','🍣','🍤'];
             ics.forEach((ic, i) => setTimeout(() => confetti({ particleCount: 40, spread: 70, origin: { y: 0.8 }, shapes: [confetti.shapeFromText({ text: ic, scalar: 2 })] }), i * 100));
             
-            document.getElementById(isG ? 'h1' : 'h2').scrollIntoView({ behavior: 'smooth' });
+            document.getElementById(isG ? 'head1' : 'head2').scrollIntoView({ behavior: 'smooth' });
             
-            // Reset
+            // Clear form
             document.getElementById(isG ? 'n1' : 'n2').value = "";
             document.getElementById(isG ? 'p1' : 'p2').value = "";
             if(isG) document.getElementById('nt1').value = "";
             else { document.getElementById('pImg').style.display='none'; document.getElementById('pTxt').style.display='block'; curImg=""; }
             document.querySelectorAll('.p-btn').forEach(b => b.classList.remove('active'));
             curP = null;
-        }).catch(err => alert("Lỗi rồi má: " + err.message));
+        }).catch(e => alert("Lỗi Firebase: " + e.message));
     };
 
-    const load = (path, target) => {
-        onValue(ref(db, path), (s) => {
+    const loadData = (path, targetId) => {
+        onValue(ref(db, path), (snapshot) => {
             const arr = [];
-            s.forEach(c => { arr.push({ id: c.key, ...c.val() }); });
+            snapshot.forEach((child) => {
+                arr.push({ id: child.key, ...child.val() });
+            });
             arr.sort((a, b) => b.p.lv - a.p.lv);
 
-            document.getElementById(target).innerHTML = arr.map(i => `
-                <div class="item ${i.status=='done'?'done':''} ${i.id === lastId ? 'highlight-new' : ''}" style="border-left-color: ${i.p.clr}">
+            document.getElementById(targetId).innerHTML = arr.map(item => `
+                <div class="item ${item.status === 'done' ? 'done' : ''} ${item.id === lastId ? 'new-item' : ''}" style="border-left-color: ${item.p.clr}">
                     <div style="flex:1">
-                        <span class="badge" style="background:${i.p.clr}">${i.p.txt}</span>
-                        ${i.img ? `<img src="${i.img}" style="width:110px;display:block;margin:10px 0;border-radius:12px">` : ''}
-                        <h3 style="margin:5px 0">${i.name}</h3>
-                        <p style="font-size:12px;color:#888;margin:0">${i.price}đ • ${i.cate}</p>
-                        ${i.note ? `<span style="font-size:12px;color:#ff85a2;display:block;margin-top:5px">📝 ${i.note}</span>` : ''}
+                        <span class="badge" style="background:${item.p.clr}">${item.p.txt}</span>
+                        ${item.img ? `<img src="${item.img}" style="width:110px;display:block;margin:10px 0;border-radius:12px">` : ''}
+                        <h3 style="margin:5px 0">${item.name}</h3>
+                        <p style="font-size:12px;color:#888;margin:0">${item.price}đ • ${item.cate}</p>
+                        ${item.note ? `<span style="font-size:12px;color:#ff85a2;display:block;margin-top:5px">📝 ${item.note}</span>` : ''}
                     </div>
                     <div style="display:flex;flex-direction:column">
-                        <button class="btn-circle" onclick="upd('${path}','${i.id}','${i.status}')">${path==='foods'?'✅':'💃'}</button>
-                        <button class="btn-circle" onclick="del('${path}','${i.id}')">🗑️</button>
+                        <button class="btn-circle" onclick="updStatus('${path}','${item.id}','${item.status}')">${path === 'foods' ? '✅' : '💃'}</button>
+                        <button class="btn-circle" onclick="delItem('${path}','${item.id}')">🗑️</button>
                     </div>
                 </div>
             `).join('');
         });
     };
 
-    load('gifts', 'list1'); load('foods', 'list2');
-    window.upd = (path, id, s) => update(ref(db, `${path}/${id}`), { status: s=='done'?'wait':'done' });
-    window.del = (path, id) => confirm("Xoá thiệt hả?") && remove(ref(db, `${path}/${id}`));
+    loadData('gifts', 'list1');
+    loadData('foods', 'list2');
+
+    window.updStatus = (path, id, s) => update(ref(db, `${path}/${id}`), { status: s === 'done' ? 'wait' : 'done' });
+    window.delItem = (path, id) => confirm("Xoá món này hả bà?") && remove(ref(db, `${path}/${id}`));
 </script>
 </body>
 </html>
-
