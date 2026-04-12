@@ -3,82 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Wishlist Realtime 🧞‍♀️</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
-    <style>
-        :root { --bg: #000; --card: #161618; --pink: #f2a2c0; --gray: #8e8e93; --green: #30d158; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: #fff; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; scroll-behavior: smooth; }
-        h1 { font-size: 28px; font-weight: 900; color: var(--pink); margin: 20px 0 5px; font-style: italic; text-align: center; }
-        .sub { font-size: 10px; color: var(--gray); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 30px; text-align: center; }
-        .form-box { width: 100%; max-width: 400px; background: var(--card); border-radius: 35px; padding: 25px; box-sizing: border-box; border: 1px solid #2c2c2e; margin-bottom: 20px; }
-        label { font-size: 11px; font-weight: 700; color: var(--gray); margin-bottom: 10px; display: block; text-transform: uppercase; }
-        input, textarea { width: 100%; background: #1c1c1e; border: 1.5px solid #2c2c2e; border-radius: 15px; padding: 16px; color: #fff; font-size: 16px; margin-bottom: 20px; outline: none; box-sizing: border-box; }
-        .select-wrapper { position: relative; width: 100%; }
-        select { width: 100%; background: #1c1c1e; border: 1.5px solid #2c2c2e; border-radius: 15px; padding: 16px; color: #fff; font-size: 16px; margin-bottom: 20px; outline: none; box-sizing: border-box; appearance: auto !important; -webkit-appearance: auto !important; }
-        textarea { height: 60px; resize: none; font-family: inherit; }
-        .row { display: grid; grid-template-columns: 1.2fr 1fr; gap: 10px; }
-        .p-group { display: flex; flex-direction: column; gap: 10px; }
-        .p-btn { background: #1c1c1e; border: 1.5px solid #2c2c2e; padding: 15px; border-radius: 20px; color: #fff; font-size: 14px; font-weight: 600; cursor: pointer; text-align: center; transition: 0.1s; }
-        .p-btn.active { border-color: var(--pink); background: rgba(242, 162, 192, 0.2); color: var(--pink); transform: scale(1.05); }
-        .add-btn { width: 100%; background: #fff; color: #000; border: none; padding: 20px; border-radius: 40px; font-weight: 900; font-size: 16px; margin-top: 20px; cursor: pointer; transition: 0.1s; }
-        .add-btn:active { transform: scale(0.85); background: var(--pink); }
-        .list-container { width: 100%; max-width: 400px; padding-bottom: 50px; }
-        h2 { font-size: 18px; font-weight: 900; margin: 40px 0 20px; padding-left: 10px; border-left: 4px solid var(--pink); }
-        .card { background: var(--card); border-radius: 30px; padding: 20px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #2c2c2e; }
-        .new-item-flash { animation: flash-brilliant 1.5s ease-in-out; }
-        @keyframes flash-brilliant { 0% { border-color: #2c2c2e; } 50% { border-color: var(--pink); box-shadow: 0 0 20px var(--pink); } 100% { border-color: #2c2c2e; } }
-        .card.is-done { opacity: 0.3; filter: grayscale(1); }
-        .info h3 { margin: 0; font-size: 18px; font-weight: 800; }
-        .info p { margin: 5px 0 0; font-size: 12px; color: var(--gray); }
-        .badge { font-size: 9px; padding: 4px 12px; border-radius: 12px; font-weight: 800; margin-bottom: 8px; display: inline-block; }
-        .p6 { background: rgba(255,59,48,0.2); color: #ff3b30; } 
-        .p5 { background: rgba(255,159,10,0.2); color: #ff9f0a; } 
-        .p4 { background: rgba(48,209,88,0.2); color: #30d158; } 
-        .p3 { background: rgba(10,132,255,0.2); color: #0a84ff; } 
-        .p2 { background: rgba(242,162,192,0.2); color: #f2a2c0; } 
-        .circle-btn { width: 45px; height: 45px; border-radius: 50%; border: 1px solid #2c2c2e; background: #1c1c1e; display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer; }
-    </style>
-</head>
-<body>
-    <h1>Wishlist của Bòi Bói Boi 🧞‍♀️</h1>
-    <div class="sub">MÓN QUÀ ANH THÍCH - BẤM LÀ CÓ NHOÉEEE 💌</div>
-    <div class="form-box">
-        <label>❤️ TÊN QUÀ TẶNG</label>
-        <input type="text" id="itemName" placeholder="Nhập tên món...">
-        <div class="row">
-            <select id="itemCate">
-                <option value="👩‍❤️‍👨 Quà đôi">👩‍❤️‍👨 Quà đôi</option>
-                <option value="⚽ Thể thao">⚽ Thể thao</option>
-                <option value="👕 Thời trang">👕 Thời trang</option>
-                <option value="💻 Công nghệ">💻 Công nghệ</option>
-                <option value="🍔 Ăn uống">🍔 Ăn uống</option>
-            </select>
-            <input type="text" id="itemPrice" placeholder="Giá" onkeyup="fVND(this)">
-        </div>
-        <label>📝 GHI CHÚ</label>
-        <textarea id="itemNote" placeholder="Ghi chú..."></textarea>
-        <label>🔥 ĐỘ ƯU TIÊN</label>
-        <div class="p-group">
-            <div class="p-btn" onclick="selP(6, this, '🔥 PHẢI CÓ')">🔥 PHẢI CÓ</div>
-            <div class="p-btn" onclick="selP(5, this, '🧐 Muốn lắm lắm')">🧐 Muốn lắm lắm</div>
-            <div class="p-btn" onclick="selP(4, this, '💕 Đang cần')">💕 Đang cần</div>
-            <div class="p-btn" onclick="selP(3, this, '🌷 Thích nha')">🌷 Thích nha</div>
-            <div class="p-btn" onclick="selP(2, this, '💬 FOMO')">💬 FOMO</div>
-        </div>
-        <button class="add-btn" id="submitBtn" onclick="sendData()">GỬI ĐẾN VŨ TRỤ 🚀</button>
-    </div>
-    <div class="list-container">
-        <h2>Danh sách ước mơ 🧚‍♀️</h2>
-        <div id="activeList"></div>
-        <h2 style="color:var(--green); border-color:var(--green)">Đã hốt ✅</h2>
-        <div id="doneList"></div>
-    </div>
-<script>
-    const firebaseConfig = {
-  apiKey: "AIzaSyAiOpChueDkBODGKessbTvHDS-YOxeSsHE",
+    <title>Wishlist App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, push, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAiOpChueDkBODGKessbTvHDS-YOxeSsHE",
   authDomain: "wishlist-c5669.firebaseapp.com",
   databaseURL: "https://wishlist-c5669-default-rtdb.asia-southeast1.firebasedatabase.app",
   projectId: "wishlist-c5669",
@@ -86,86 +20,209 @@
   messagingSenderId: "821194575297",
   appId: "1:821194575297:web:185b7837e6cdee4783f340",
   measurementId: "G-RHE1QBW9WX"
-};
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-    let curP = null;
-    let lastId = "";
+        };
 
-    function fVND(i) {
-        let v = i.value.replace(/\D/g, "");
-        i.value = v.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    }
-    function selP(lv, btn, txt) {
-        document.querySelectorAll('.p-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        curP = { lv, txt };
-    }
-    function sendData() {
-        const name = document.getElementById('itemName').value;
-        const price = document.getElementById('itemPrice').value;
-        const cate = document.getElementById('itemCate').value;
-        const note = document.getElementById('itemNote').value;
-        if (!name || !curP) return alert("Chọn độ ưu tiên!");
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const wishlistRef = ref(db, 'gifts');
 
-        const btn = document.getElementById('submitBtn');
-        const rect = btn.getBoundingClientRect();
-        const x = (rect.left + rect.width / 2) / window.innerWidth;
-        const y = (rect.top + rect.height / 2) / window.innerHeight;
-        const shapes = ['🎁', '💖', '🔥', '⭐', '🎉'].map(t => confetti.shapeFromText({ text: t, scalar: 3 }));
-        confetti({ particleCount: 300, spread: 100, origin: { x, y }, shapes });
+        let selectedPriority = 1; 
 
-        const ref = db.ref('wishlist_v1').push();
-        lastId = ref.key;
-        ref.set({ name, price: price || "0", cate, note, priority: curP, status: 'waiting', time: Date.now() });
+        const getPriorityStyle = (priority) => {
+            switch (priority) {
+                case 5: return 'bg-red-600 text-white shadow-[0_0_10px_rgba(220,38,38,0.4)]';
+                case 4: return 'bg-pink-500 text-white';
+                case 3: return 'bg-amber-500 text-black';
+                case 2: return 'bg-emerald-500 text-white';
+                case 1: return 'bg-zinc-600 text-zinc-200';
+                default: return 'bg-zinc-800 text-zinc-400';
+            }
+        };
 
-        document.getElementById('itemName').value = "";
-        document.getElementById('itemPrice').value = "";
-        document.getElementById('itemNote').value = "";
-        document.querySelectorAll('.p-btn').forEach(b => b.classList.remove('active'));
-        curP = null;
-    }
-    function toggleStatus(id, s) {
-        const next = s === 'waiting' ? 'done' : 'waiting';
-        db.ref('wishlist_v1/' + id).update({ status: next });
-    }
-    db.ref('wishlist_v1').on('value', (snap) => {
-        const aBox = document.getElementById('activeList');
-        const dBox = document.getElementById('doneList');
-        let aH = "", dH = "";
-        const items = [];
-        snap.forEach(c => { items.push({id: c.key, ...c.val()}); });
-        items.sort((a, b) => b.priority.lv - a.priority.lv || b.time - a.time);
-        items.forEach(i => {
-            const isD = i.status === 'done';
-            const h = `<div class="card ${isD ? 'is-done' : ''} ${i.id === lastId ? 'new-item-flash' : ''}" id="${i.id}">
-                <div class="info">
-                    <span class="badge p${i.priority.lv}">${i.priority.txt}</span>
-                    <h3>${i.name}</h3>
-                    <p>${i.cate} • 💰 ${i.price}đ</p>
-                    ${i.note ? `<p style="color:var(--pink);font-size:11px;margin-top:5px;">📝 ${i.note}</p>` : ''}
-                </div>
-                <div class="actions" style="display:flex;gap:10px;">
-                    <button class="circle-btn" style="color:var(--green);border-color:var(--green)" onclick="toggleStatus('${i.id}', '${i.status}')">${isD ? '↩️' : '💃'}</button>
-                    <button class="circle-btn" onclick="confirm('Xóa?') && db.ref('wishlist_v1/${i.id}').remove()">🗑️</button>
-                </div>
-            </div>`;
-            if(isD) dH += h; else aH += h;
+        window.selectPriority = (val) => {
+            selectedPriority = val;
+            document.querySelectorAll('.priority-btn').forEach(btn => btn.classList.remove('active-priority'));
+            document.getElementById('priority-' + val).classList.add('active-priority');
+        };
+
+        document.getElementById('giftPrice').addEventListener('input', (e) => {
+            let value = e.target.value.replace(/\D/g, "");
+            e.target.value = new Intl.NumberFormat('en-US').format(value);
         });
-        aBox.innerHTML = aH || "<p style='text-align:center;color:#333;'>Chưa có món nào...</p>";
-        dBox.innerHTML = dH || "<p style='text-align:center;color:#333;'>Chưa hốt được gì...</p>";
-        
-        if (lastId) {
-            const el = document.getElementById(lastId);
-            if (el) {
-                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                setTimeout(() => { lastId = ""; }, 2000);
+
+        window.addGift = (btn) => {
+            const name = document.getElementById('giftName').value;
+            const category = document.getElementById('category').value;
+            const price = document.getElementById('giftPrice').value;
+            const note = document.getElementById('giftNote').value;
+
+            if (!name || !price) return alert("Nhập đủ tên nhé!");
+
+            btn.classList.add('btn-bounce-glow');
+            setTimeout(() => btn.classList.remove('btn-bounce-glow'), 400);
+
+            push(wishlistRef, {
+                name, category, price, note,
+                priority: selectedPriority,
+                status: 'pending',
+                createdAt: Date.now()
+            });
+
+            triggerGiftBurst();
+
+            document.getElementById('giftName').value = "";
+            document.getElementById('giftPrice').value = "";
+            document.getElementById('giftNote').value = "";
+            document.getElementById('category').selectedIndex = 0;
+            selectPriority(1); 
+
+            setTimeout(() => {
+                const firstItem = document.querySelector('#wishlistContainer > div:first-child');
+                if (firstItem) {
+                    firstItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    firstItem.style.transition = "all 0.6s ease";
+                    firstItem.style.boxShadow = "0 0 40px rgba(244, 114, 182, 0.7)";
+                    firstItem.style.borderColor = "#f472b6";
+                    setTimeout(() => {
+                        firstItem.style.boxShadow = "none";
+                        firstItem.style.borderColor = "#27272a"; 
+                    }, 2500);
+                }
+            }, 600);
+        };
+
+        onValue(wishlistRef, (snapshot) => {
+            const container = document.getElementById('wishlistContainer');
+            container.innerHTML = "";
+            const data = snapshot.val();
+            if (data) {
+                const items = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+                items.sort((a, b) => (b.priority !== a.priority) ? (b.priority - a.priority) : (b.createdAt - a.createdAt));
+
+                items.forEach(item => {
+                    const isBought = item.status === 'bought';
+                    const labels = ["", "💬 FOMO", "🌷 Thích nha", "🙄 Muốn lắm", "💕 Cần rồi", "🔥 PHẢI CÓ"];
+                    const html = `
+                        <div class="p-6 mb-5 rounded-[2.5rem] border border-zinc-800 bg-[#0d0d0d] transition-all duration-500 ${isBought ? 'opacity-30 grayscale' : ''}">
+                            <div class="flex justify-between items-center">
+                                <div class="flex-1 pr-3">
+                                    <span class="text-[9px] px-2.5 py-1 rounded-full font-black uppercase tracking-wider ${getPriorityStyle(item.priority)}">
+                                        ${labels[item.priority]}
+                                    </span>
+                                    <h3 class="font-bold text-xl mt-3 ${isBought ? 'line-through text-zinc-600' : 'text-pink-100'}">${item.name}</h3>
+                                    <p class="text-[11px] text-zinc-500 font-bold tracking-widest mt-1">💕 ${item.category} • ${item.price}đ</p>
+                                    ${item.note ? `<p class="text-xs text-zinc-400 mt-3 italic bg-zinc-900/80 p-3 rounded-2xl border border-zinc-800/40">Ghi chú: ${item.note}</p>` : ''}
+                                </div>
+                                <div class="flex flex-col gap-4">
+                                    <button onclick="updateStatus('${item.id}', '${isBought ? 'pending' : 'bought'}')" class="w-14 h-14 ${isBought ? 'bg-green-500' : 'bg-zinc-900'} border border-zinc-800 rounded-2xl flex items-center justify-center active:scale-90 text-2xl shadow-lg">💃</button>
+                                    <button onclick="deleteItem('${item.id}')" class="w-14 h-14 bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center justify-center active:scale-90 text-2xl shadow-lg">🗑️</button>
+                                </div>
+                            </div>
+                        </div>`;
+                    container.insertAdjacentHTML('beforeend', html);
+                });
+            }
+        });
+
+        window.deleteItem = (id) => { if(confirm("Xoá món quà này nhé?")) remove(ref(db, `gifts/${id}`)); };
+        window.updateStatus = (id, status) => update(ref(db, `gifts/${id}`), { status });
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+
+    <style>
+        body { background-color: #000; color: #fff; font-family: -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
+        input, select, textarea { background-color: #121212 !important; border: 1px solid #222 !important; color: white !important; outline: none; }
+        input:focus, textarea:focus { border-color: #f472b6 !important; }
+        .card-main { background: #0b0b0b; border: 1px solid #1a1a1a; border-radius: 2.5rem; }
+        .priority-btn { background: #121212; border: 1px solid #222; transition: 0.3s; color: #666; font-size: 11px; font-weight: bold; }
+        .active-priority { background: rgba(244, 114, 182, 0.15); border-color: #f472b6; color: #f472b6; transform: scale(1.02); }
+        .btn-bounce-glow { animation: bounceGlow 0.4s ease-out; background-color: #f472b6 !important; }
+        @keyframes bounceGlow { 0% { transform: scale(1); } 50% { transform: scale(1.05); box-shadow: 0 0 30px rgba(244, 114, 182, 0.5); } 100% { transform: scale(1); } }
+        .gift-box { position: fixed; font-size: 35px; pointer-events: none; z-index: 9999; }
+        select { -webkit-appearance: none; appearance: none; }
+    </style>
+</head>
+<body class="flex justify-center min-h-screen p-4 pb-24">
+    <div class="w-full max-w-md">
+        <div class="text-center my-12">
+            <h1 class="text-2xl font-black italic text-pink-200 tracking-tighter">Wishlist của Bòi Bói Boi🫃🏻</h1>
+            <p class="text-zinc-600 text-[10px] mt-2 tracking-[0.2em] uppercase font-bold italic">Thêm món quà anh thích vào đây nhoéeee💌</p>
+        </div>
+
+        <div class="card-main p-8 mb-16 shadow-2xl border-t border-zinc-800/30">
+            <div class="space-y-6">
+                <div>
+                    <label class="text-[10px] font-black text-zinc-600 ml-1 uppercase italic tracking-widest">❤️ Tên quà tặng</label>
+                    <input type="text" id="giftName" placeholder="Tên món quà..." class="w-full p-4.5 rounded-2xl mt-2 text-sm">
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="relative">
+                        <label class="text-[10px] font-black text-zinc-600 ml-1 uppercase italic tracking-widest">🏷️ Danh mục</label>
+                        <select id="category" class="w-full p-4.5 rounded-2xl mt-2 text-sm appearance-none pr-10">
+                            <option value="💕 Lãng Mạn">💕 Lãng Mạn</option>
+                            <option value="🎮 Công Nghệ">🎮 Công Nghệ</option>
+                            <option value="👕 Thời Trang">👕 Thời Trang</option>
+                            <option value="⚽ Thể Thao">⚽ Thể Thao</option>
+                        </select>
+                        <i class="fas fa-chevron-down absolute right-4 bottom-5 text-zinc-700 text-[10px]"></i>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-black text-zinc-600 ml-1 uppercase italic tracking-widest">$ Giá (VNĐ)</label>
+                        <div class="relative">
+                            <input type="text" id="giftPrice" placeholder="500,000" class="w-full p-4.5 rounded-2xl mt-2 text-sm font-bold pr-10">
+                            <span class="absolute right-4 bottom-4.5 text-zinc-600 font-bold">đ</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="text-[10px] font-black text-zinc-600 ml-1 uppercase italic tracking-widest mb-3 block">🔥 Độ ưu tiên</label>
+                    <div class="grid grid-cols-1 gap-2">
+                        <button onclick="selectPriority(1)" id="priority-1" class="priority-btn p-4 rounded-2xl active-priority italic">💬 FOMO</button>
+                        <button onclick="selectPriority(2)" id="priority-2" class="priority-btn p-4 rounded-2xl italic">🌷 Thích nha</button>
+                        <button onclick="selectPriority(3)" id="priority-3" class="priority-btn p-4 rounded-2xl italic">🙄 Muốn lắm</button>
+                        <button onclick="selectPriority(4)" id="priority-4" class="priority-btn p-4 rounded-2xl italic">💕 Cần rồi</button>
+                        <button onclick="selectPriority(5)" id="priority-5" class="priority-btn p-4 rounded-2xl italic text-red-500">🔥 PHẢI CÓ</button>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="text-[10px] font-black text-zinc-600 ml-1 uppercase italic tracking-widest">📝 Ghi chú chi tiết</label>
+                    <textarea id="giftNote" placeholder="Size, màu sắc, cấu hình hoặc dán link sản phẩm vào đây..." class="w-full p-4.5 rounded-2xl mt-2 text-sm h-28 resize-none font-medium"></textarea>
+                </div>
+
+                <button onclick="addGift(this)" class="w-full py-5 bg-pink-600 text-white rounded-[2.5rem] font-black text-xs tracking-[0.2em] uppercase active:scale-95 transition-all shadow-xl">
+                    🚀 THÊM VÀO WISHLIST 💖
+                </button>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-4 mb-10 px-2">
+            <h2 class="text-xl font-black text-pink-200 italic">Danh sách ước mơ 🧚🏻‍♂️</h2>
+            <div class="h-[1px] flex-1 bg-zinc-900"></div>
+        </div>
+
+        <div id="wishlistContainer" class="space-y-5"></div>
+    </div>
+
+    <script>
+        function triggerGiftBurst() {
+            const icons = ['🎁', '💃', '✨', '💖', '💍', '🧸'];
+            for (let i = 0; i < 20; i++) {
+                const b = document.createElement('div');
+                b.className = 'gift-box';
+                b.innerText = icons[Math.floor(Math.random() * icons.length)];
+                b.style.left = '50%'; b.style.top = '45%';
+                document.body.appendChild(b);
+                anime({
+                    targets: b, translateX: () => anime.random(-300, 300), translateY: () => anime.random(-600, 0),
+                    rotate: () => anime.random(-360, 360), opacity: [1, 0], scale: [0, 2, 0.5],
+                    duration: 2000, easing: 'easeOutExpo', complete: () => b.remove()
+                });
             }
         }
-    });
-</script>
+    </script>
 </body>
 </html>
-
-
