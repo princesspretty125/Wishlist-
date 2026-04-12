@@ -31,7 +31,17 @@
         let foodPriority = 1;
         let foodImageBase64 = "";
 
-        const getPriorityStyle = (priority) => {
+        const getPriorityStyle = (priority, isFood) => {
+            if(isFood) {
+                switch (priority) {
+                    case 5: return 'bg-orange-600 text-white shadow-[0_0_10px_rgba(234,88,12,0.4)]';
+                    case 4: return 'bg-orange-400 text-white';
+                    case 3: return 'bg-amber-400 text-black';
+                    case 2: return 'bg-yellow-500 text-black';
+                    case 1: return 'bg-zinc-600 text-zinc-200';
+                    default: return 'bg-zinc-800 text-zinc-400';
+                }
+            }
             switch (priority) {
                 case 5: return 'bg-red-600 text-white shadow-[0_0_10px_rgba(220,38,38,0.4)]';
                 case 4: return 'bg-pink-500 text-white';
@@ -50,8 +60,8 @@
 
         window.selectFoodPriority = (val) => {
             foodPriority = val;
-            document.querySelectorAll('.food-priority-btn').forEach(btn => btn.classList.remove('active-priority'));
-            document.getElementById('food-priority-' + val).classList.add('active-priority');
+            document.querySelectorAll('.food-priority-btn').forEach(btn => btn.classList.remove('active-food-priority'));
+            document.getElementById('food-priority-' + val).classList.add('active-food-priority');
         };
 
         document.getElementById('giftPrice').addEventListener('input', (e) => {
@@ -83,19 +93,15 @@
             const category = document.getElementById('category').value;
             const price = document.getElementById('giftPrice').value;
             const note = document.getElementById('giftNote').value;
-
             if (!name || !price) return alert("Nhập đủ tên nhé!");
-
             btn.classList.add('btn-bounce-glow');
             setTimeout(() => btn.classList.remove('btn-bounce-glow'), 400);
-
             push(wishlistRef, {
                 name, category, price, note,
                 priority: selectedPriority,
                 status: 'pending',
                 createdAt: Date.now()
             });
-
             triggerGiftBurst();
             document.getElementById('giftName').value = "";
             document.getElementById('giftPrice').value = "";
@@ -108,12 +114,9 @@
             const name = document.getElementById('foodName').value;
             const category = document.getElementById('foodCategory').value;
             const price = document.getElementById('foodPrice').value;
-
             if (!name || !price) return alert("Nhập đủ tên món nhé!");
-
-            btn.classList.add('btn-bounce-glow');
-            setTimeout(() => btn.classList.remove('btn-bounce-glow'), 400);
-
+            btn.classList.add('btn-bounce-orange');
+            setTimeout(() => btn.classList.remove('btn-bounce-orange'), 400);
             push(foodRef, {
                 name, category, price,
                 image: foodImageBase64,
@@ -121,7 +124,6 @@
                 status: 'pending',
                 createdAt: Date.now()
             });
-
             triggerGiftBurst();
             document.getElementById('foodName').value = "";
             document.getElementById('foodPrice').value = "";
@@ -137,11 +139,10 @@
             const data = snapshot.val();
             if (data) {
                 const items = Object.keys(data).map(key => ({ id: key, ...data[key] }));
-                items.sort((a, b) => (b.priority !== a.priority) ? (b.priority - a.priority) : (b.createdAt - a.createdAt));
+                items.sort((a, b) => (b.priority - a.priority) || (b.createdAt - a.createdAt));
                 items.forEach(item => {
-                    const isBought = item.status === 'bought';
                     const labels = ["", "💬 FOMO", "🌷 Thích nha", "🙄 Muốn lắm", "💕 Cần rồi", "🔥 PHẢI CÓ"];
-                    container.insertAdjacentHTML('beforeend', renderItem(item, isBought, labels, 'updateStatus', 'deleteItem'));
+                    container.insertAdjacentHTML('beforeend', renderItem(item, labels, 'updateStatus', 'deleteItem', false));
                 });
             }
         });
@@ -152,26 +153,26 @@
             const data = snapshot.val();
             if (data) {
                 const items = Object.keys(data).map(key => ({ id: key, ...data[key] }));
-                items.sort((a, b) => (b.priority !== a.priority) ? (b.priority - a.priority) : (b.createdAt - a.createdAt));
+                items.sort((a, b) => (b.priority - a.priority) || (b.createdAt - a.createdAt));
                 items.forEach(item => {
-                    const isBought = item.status === 'bought';
                     const labels = ["", "🍜 Thử cho biết", "🍕 Khá thèm", "🍔 Rất đói", "🍣 Ghiền quá", "🔥 THÈM CHẾT MẤT"];
-                    container.insertAdjacentHTML('beforeend', renderItem(item, isBought, labels, 'updateFoodStatus', 'deleteFoodItem', true));
+                    container.insertAdjacentHTML('beforeend', renderItem(item, labels, 'updateFoodStatus', 'deleteFoodItem', true));
                 });
             }
         });
 
-        function renderItem(item, isBought, labels, statusFn, deleteFn, isFood = false) {
+        function renderItem(item, labels, statusFn, deleteFn, isFood) {
+            const isBought = item.status === 'bought';
             return `
                 <div class="p-6 mb-5 rounded-[2.5rem] border border-zinc-800 bg-[#0d0d0d] transition-all duration-500 ${isBought ? 'opacity-30 grayscale' : ''}">
                     <div class="flex justify-between items-center">
                         <div class="flex-1 pr-3">
-                            <span class="text-[9px] px-2.5 py-1 rounded-full font-black uppercase tracking-wider ${getPriorityStyle(item.priority)}">
+                            <span class="text-[9px] px-2.5 py-1 rounded-full font-black uppercase tracking-wider ${getPriorityStyle(item.priority, isFood)}">
                                 ${labels[item.priority]}
                             </span>
-                            <h3 class="font-bold text-xl mt-3 ${isBought ? 'line-through text-zinc-600' : 'text-pink-100'}">${item.name}</h3>
+                            <h3 class="font-bold text-xl mt-3 ${isBought ? 'line-through text-zinc-600' : (isFood ? 'text-orange-100' : 'text-pink-100')}">${item.name}</h3>
                             <p class="text-[11px] text-zinc-500 font-bold tracking-widest mt-1">${isFood ? '😋' : '💕'} ${item.category} • ${item.price}đ</p>
-                            ${item.image ? `<img src="${item.image}" class="mt-3 rounded-2xl w-full h-40 object-cover border border-zinc-800">` : ''}
+                            ${item.image ? `<img src="${item.image}" class="mt-4 rounded-3xl w-full h-48 object-cover border border-zinc-800 shadow-2xl">` : ''}
                             ${item.note ? `<p class="text-xs text-zinc-400 mt-3 italic bg-zinc-900/80 p-3 rounded-2xl border border-zinc-800/40">Ghi chú: ${item.note}</p>` : ''}
                         </div>
                         <div class="flex flex-col gap-4">
@@ -184,7 +185,7 @@
 
         window.deleteItem = (id) => { if(confirm("Xoá món quà này nhé?")) remove(ref(db, `gifts/${id}`)); };
         window.updateStatus = (id, status) => update(ref(db, `gifts/${id}`), { status });
-        window.deleteFoodItem = (id) => { if(confirm("Xoá món này khỏi menu nhé?")) remove(ref(db, `foods/${id}`)); };
+        window.deleteFoodItem = (id) => { if(confirm("Xoá món này nhé?")) remove(ref(db, `foods/${id}`)); };
         window.updateFoodStatus = (id, status) => update(ref(db, `foods/${id}`), { status });
         
         window.switchTab = (tab) => {
@@ -192,21 +193,14 @@
             const foodTab = document.getElementById('tab-foods');
             const btnGift = document.getElementById('btn-tab-gift');
             const btnFood = document.getElementById('btn-tab-food');
-            
             if(tab === 'gifts') {
-                giftTab.classList.remove('hidden');
-                foodTab.classList.add('hidden');
-                btnGift.classList.add('bg-pink-600', 'text-white');
-                btnGift.classList.remove('bg-zinc-900', 'text-zinc-500');
-                btnFood.classList.add('bg-zinc-900', 'text-zinc-500');
-                btnFood.classList.remove('bg-pink-600', 'text-white');
+                giftTab.classList.remove('hidden'); foodTab.classList.add('hidden');
+                btnGift.className = "flex-1 py-4 rounded-[2rem] font-black text-[10px] tracking-widest uppercase bg-pink-600 text-white shadow-lg transition-all duration-300";
+                btnFood.className = "flex-1 py-4 rounded-[2rem] font-black text-[10px] tracking-widest uppercase bg-zinc-900 text-zinc-500 shadow-lg transition-all duration-300";
             } else {
-                giftTab.classList.add('hidden');
-                foodTab.classList.remove('hidden');
-                btnFood.classList.add('bg-pink-600', 'text-white');
-                btnFood.classList.remove('bg-zinc-900', 'text-zinc-500');
-                btnGift.classList.add('bg-zinc-900', 'text-zinc-500');
-                btnGift.classList.remove('bg-pink-600', 'text-white');
+                giftTab.classList.add('hidden'); foodTab.classList.remove('hidden');
+                btnFood.className = "flex-1 py-4 rounded-[2rem] font-black text-[10px] tracking-widest uppercase bg-orange-500 text-white shadow-lg transition-all duration-300";
+                btnGift.className = "flex-1 py-4 rounded-[2rem] font-black text-[10px] tracking-widest uppercase bg-zinc-900 text-zinc-500 shadow-lg transition-all duration-300";
             }
         };
     </script>
@@ -217,21 +211,24 @@
         body { background-color: #000; color: #fff; font-family: -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
         input, select, textarea { background-color: #121212 !important; border: 1px solid #222 !important; color: white !important; outline: none; }
         input:focus, textarea:focus { border-color: #f472b6 !important; }
+        .food-tab input:focus, .food-tab textarea:focus { border-color: #f59e0b !important; }
         .card-main { background: #0b0b0b; border: 1px solid #1a1a1a; border-radius: 2.5rem; }
         .priority-btn { background: #121212; border: 1px solid #222; transition: 0.3s; color: #666; font-size: 11px; font-weight: bold; }
         .active-priority { background: rgba(244, 114, 182, 0.15); border-color: #f472b6; color: #f472b6; transform: scale(1.02); }
-        .btn-bounce-glow { animation: bounceGlow 0.4s ease-out; background-color: #f472b6 !important; }
+        .active-food-priority { background: rgba(245, 158, 11, 0.15); border-color: #f59e0b; color: #f59e0b; transform: scale(1.02); }
+        .btn-bounce-glow { animation: bounceGlow 0.4s ease-out; background-color: #db2777 !important; }
+        .btn-bounce-orange { animation: bounceOrange 0.4s ease-out; background-color: #ea580c !important; }
         @keyframes bounceGlow { 0% { transform: scale(1); } 50% { transform: scale(1.05); box-shadow: 0 0 30px rgba(244, 114, 182, 0.5); } 100% { transform: scale(1); } }
+        @keyframes bounceOrange { 0% { transform: scale(1); } 50% { transform: scale(1.05); box-shadow: 0 0 30px rgba(245, 158, 11, 0.5); } 100% { transform: scale(1); } }
         .gift-box { position: fixed; font-size: 35px; pointer-events: none; z-index: 9999; }
         select { -webkit-appearance: none; appearance: none; }
-        .tab-btn { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
     </style>
 </head>
 <body class="flex justify-center min-h-screen p-4 pb-24">
     <div class="w-full max-w-md">
         <div class="flex justify-center gap-3 mb-8">
-            <button id="btn-tab-gift" onclick="switchTab('gifts')" class="tab-btn flex-1 py-4 rounded-[2rem] font-black text-[10px] tracking-widest uppercase bg-pink-600 text-white shadow-lg">🎁 Wishlist</button>
-            <button id="btn-tab-food" onclick="switchTab('foods')" class="tab-btn flex-1 py-4 rounded-[2rem] font-black text-[10px] tracking-widest uppercase bg-zinc-900 text-zinc-500 shadow-lg">🍜 Foodlist</button>
+            <button id="btn-tab-gift" onclick="switchTab('gifts')" class="flex-1 py-4 rounded-[2rem] font-black text-[10px] tracking-widest uppercase bg-pink-600 text-white shadow-lg transition-all duration-300">🎁 Wishlist</button>
+            <button id="btn-tab-food" onclick="switchTab('foods')" class="flex-1 py-4 rounded-[2rem] font-black text-[10px] tracking-widest uppercase bg-zinc-900 text-zinc-500 shadow-lg transition-all duration-300">🍜 Foodlist</button>
         </div>
 
         <div id="tab-gifts">
@@ -239,7 +236,6 @@
                 <h1 class="text-2xl font-black italic text-pink-200 tracking-tighter">Wishlist của Bòi Bói Boi🫃🏻</h1>
                 <p class="text-zinc-600 text-[10px] mt-2 tracking-[0.2em] uppercase font-bold italic">Thêm món quà anh thích vào đây nhoéeee💌</p>
             </div>
-
             <div class="card-main p-8 mb-16 shadow-2xl border-t border-zinc-800/30">
                 <div class="space-y-6">
                     <div>
@@ -282,17 +278,16 @@
                     <button onclick="addGift(this)" class="w-full py-5 bg-pink-600 text-white rounded-[2.5rem] font-black text-xs tracking-[0.2em] uppercase active:scale-95 transition-all shadow-xl">🚀 THÊM VÀO WISHLIST 💖</button>
                 </div>
             </div>
-              <div class="flex items-center gap-4 mb-10 px-2">
+            <div class="flex items-center gap-4 mb-10 px-2">
                 <h2 class="text-xl font-black text-pink-200 italic">Danh sách ước mơ 🧚🏻‍♂️</h2>
-                <div class="h-[1px] flex-1 bg-zinc-900">
-                </div>
+                <div class="h-[1px] flex-1 bg-zinc-900"></div>
             </div>
             <div id="wishlistContainer" class="space-y-5"></div>
         </div>
 
-        <div id="tab-foods" class="hidden">
+        <div id="tab-foods" class="hidden food-tab">
             <div class="text-center my-12">
-                <h1 class="text-2xl font-black italic text-pink-200 tracking-tighter">Foodlist Toàn Món Ngon🤤</h1>
+                <h1 class="text-2xl font-black italic text-orange-200 tracking-tighter">Foodlist Toàn Món Ngon🤤</h1>
                 <p class="text-zinc-600 text-[10px] mt-2 tracking-[0.2em] uppercase font-bold italic">Thèm gì thì cứ mạnh dạn thêm vào đêêê🍕</p>
             </div>
             <div class="card-main p-8 mb-16 shadow-2xl border-t border-zinc-800/30">
@@ -304,8 +299,8 @@
                         </div>
                         <div class="w-24">
                             <label class="text-[10px] font-black text-zinc-600 ml-1 uppercase italic tracking-widest">📸 Ảnh</label>
-                            <label class="w-full h-[52px] mt-2 bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center justify-center cursor-pointer overflow-hidden">
-                                <i id="cameraIcon" class="fas fa-camera text-zinc-500"></i>
+                            <label class="w-full h-[52px] mt-2 bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center justify-center cursor-pointer overflow-hidden relative">
+                                <i id="cameraIcon" class="fas fa-camera text-zinc-500 text-lg"></i>
                                 <img id="previewImg" class="w-full h-full object-cover hidden">
                                 <input type="file" accept="image/*" onchange="handleImageUpload(event)" class="hidden">
                             </label>
@@ -316,7 +311,7 @@
                             <label class="text-[10px] font-black text-zinc-600 ml-1 uppercase italic tracking-widest">🥨 Loại đồ ăn</label>
                             <select id="foodCategory" class="w-full p-4.5 rounded-2xl mt-2 text-sm appearance-none pr-10">
                                 <option value="🥘 Đồ Mặn">🥘 Đồ Mặn</option>
-                                <option value="🍦 Đồ ngọt">🍦 Đồ ngọt</option>
+                                <option value="🍦 Tráng Miệng">🍦 Tráng Miệng</option>
                                 <option value="🧋 Trà Sữa">🧋 Trà Sữa</option>
                                 <option value="🍿 Ăn Vặt">🍿 Ăn Vặt</option>
                             </select>
@@ -333,20 +328,19 @@
                     <div>
                         <label class="text-[10px] font-black text-zinc-600 ml-1 uppercase italic tracking-widest mb-3 block">🔥 Độ thèm thuồng</label>
                         <div class="grid grid-cols-1 gap-2">
-                            <button onclick="selectFoodPriority(1)" id="food-priority-1" class="priority-btn food-priority-btn p-4 rounded-2xl active-priority italic">🍜 Thử cho biết</button>
+                            <button onclick="selectFoodPriority(1)" id="food-priority-1" class="priority-btn food-priority-btn p-4 rounded-2xl active-food-priority italic">🍜 Thử cho biết</button>
                             <button onclick="selectFoodPriority(2)" id="food-priority-2" class="priority-btn food-priority-btn p-4 rounded-2xl italic">🍕 Khá thèm</button>
                             <button onclick="selectFoodPriority(3)" id="food-priority-3" class="priority-btn food-priority-btn p-4 rounded-2xl italic">🍔 Rất đói</button>
                             <button onclick="selectFoodPriority(4)" id="food-priority-4" class="priority-btn food-priority-btn p-4 rounded-2xl italic">🍣 Ghiền quá</button>
-                            <button onclick="selectFoodPriority(5)" id="food-priority-5" class="priority-btn food-priority-btn p-4 rounded-2xl italic text-red-500">🔥 THÈM CHẾT MẤT</button>
+                            <button onclick="selectFoodPriority(5)" id="food-priority-5" class="priority-btn food-priority-btn p-4 rounded-2xl italic text-orange-500">🔥 THÈM CHẾT MẤT</button>
                         </div>
                     </div>
-                    <button onclick="addFood(this)" class="w-full py-5 bg-pink-600 text-white rounded-[2.5rem] font-black text-xs tracking-[0.2em] uppercase active:scale-95 transition-all shadow-xl">🚀 CHỐT ĐƠN ĐI ĂN THÔI 💖</button>
+                    <button onclick="addFood(this)" class="w-full py-5 bg-orange-500 text-white rounded-[2.5rem] font-black text-xs tracking-[0.2em] uppercase active:scale-95 transition-all shadow-xl">🚀 CHỐT ĐƠN ĐI ĂN THÔI 💖</button>
                 </div>
             </div>
-                  <div class="flex items-center gap-4 mb-10 px-2">
-                <h2 class="text-xl font-black text-pink-200 italic">Dự án nuôi eimmmmm🐖</h2>
-                <div class="h-[1px] flex-1 bg-zinc-900">
-                </div>
+            <div class="flex items-center gap-4 mb-10 px-2">
+                <h2 class="text-xl font-black text-orange-200 italic">Thực đơn mong đợi 🍔</h2>
+                <div class="h-[1px] flex-1 bg-zinc-900"></div>
             </div>
             <div id="foodListContainer" class="space-y-5"></div>
         </div>
@@ -354,7 +348,7 @@
 
     <script>
         function triggerGiftBurst() {
-            const icons = ['🎁', '💃', '✨', '💖', '💍', '🧸', '🍜', '🍕', '🍣'];
+            const icons = ['🎁', '💃', '✨', '💖', '💍', '🧸', '🍜', '🍕', '🍣', '🍔'];
             for (let i = 0; i < 20; i++) {
                 const b = document.createElement('div');
                 b.className = 'gift-box';
@@ -371,4 +365,3 @@
     </script>
 </body>
 </html>
-
