@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Wishlist của Bòi Bói Boi</title>
+    <title>Wishlist & Foodlist</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
     <style>
         body { background-color: #000; color: #fff; font-family: -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
-        input, select, textarea { background-color: #121212 !important; border: 1px solid #222 !important; color: white !important; outline: none; }
+        input, select, textarea { background-color: #121212 !important; border: 1px solid #222 !important; color: white !important; outline: none; transition: 0.3s; }
+        input:focus, select:focus, textarea:focus { border-color: #f472b6 !important; box-shadow: 0 0 10px rgba(244, 114, 182, 0.1); }
         .card-main { background: #0b0b0b; border: 1px solid #1a1a1a; border-radius: 2.5rem; }
         .priority-btn { background: #121212; border: 1px solid #222; transition: 0.3s; color: #666; font-size: 11px; font-weight: bold; }
         .active-priority { background: rgba(244, 114, 182, 0.15); border-color: #f472b6 !important; color: #f472b6 !important; }
@@ -18,87 +19,113 @@
         .hidden { display: none !important; }
         #roleOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .role-card { background: #1a1a1a; padding: 40px 20px; border-radius: 40px; border: 1px solid #333; text-align: center; width: 85%; max-width: 400px; }
-        .role-btn { width: 100%; padding: 20px; margin: 12px 0; border-radius: 20px; font-weight: 800; font-size: 18px; }
+        .role-btn { width: 100%; padding: 20px; margin: 12px 0; border-radius: 20px; font-weight: 800; font-size: 18px; color: white; }
+        .select-wrapper { position: relative; }
+        .select-wrapper::after { content: '\f078'; font-family: 'Font Awesome 5 Free'; font-weight: 900; position: absolute; right: 18px; top: 50%; transform: translateY(-50%); pointer-events: none; color: #f472b6; font-size: 10px; }
+        .food-select::after { color: #f59e0b; }
+        .list-title { font-size: 13px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.1em; color: #444; margin-bottom: 25px; text-align: center; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .list-title::before, .list-title::after { content: ''; flex: 1; height: 1px; background: #1a1a1a; }
     </style>
 </head>
 <body class="flex justify-center min-h-screen p-4 pb-24">
     <div id="roleOverlay" class="hidden">
-        <div class="role-card">
-            <h2 style="color:white; margin-bottom: 30px; font-size: 24px;">Bạn là ai thế? 🧐</h2>
-            <button class="role-btn bg-pink-600" onclick="setRole('em')">LÀ EM (Công Chúa)</button>
-            <button class="role-btn bg-blue-500" onclick="setRole('anh')">LÀ ANH (Bòi Bói Boi)</button>
+        <div class="role-card shadow-2xl">
+            <h2 class="text-white mb-8 text-2xl font-black">BẠN LÀ AI? 🧐</h2>
+            <button class="role-btn bg-pink-600 shadow-lg active:scale-95" onclick="setRole('em')">LÀ EM (Công Chúa)</button>
+            <button class="role-btn bg-blue-500 shadow-lg active:scale-95" onclick="setRole('anh')">LÀ ANH (Bòi Bói Boi)</button>
         </div>
     </div>
+
     <div class="w-full max-w-md">
-        <div class="flex justify-center gap-3 mb-8">
-            <button id="btn-tab-gift" onclick="switchTab('gifts')" class="flex-1 py-4 rounded-[2rem] font-black text-[10px] tracking-widest uppercase bg-pink-600 text-white shadow-lg">🎁 Wishlist</button>
-            <button id="btn-tab-food" onclick="switchTab('foods')" class="flex-1 py-4 rounded-[2rem] font-black text-[10px] tracking-widest uppercase bg-zinc-900 text-zinc-500 shadow-lg">🍜 Foodlist</button>
+        <div class="flex justify-center gap-3 mb-10">
+            <button id="btn-tab-gift" onclick="switchTab('gifts')" class="flex-1 py-4 rounded-[2rem] font-black text-[10px] tracking-widest uppercase bg-pink-600 text-white shadow-lg transition-all">🎁 Wishlist</button>
+            <button id="btn-tab-food" onclick="switchTab('foods')" class="flex-1 py-4 rounded-[2rem] font-black text-[10px] tracking-widest uppercase bg-zinc-900 text-zinc-500 transition-all">🍜 Foodlist</button>
         </div>
+
+        <!-- WISHLIST -->
         <div id="tab-gifts">
-            <div class="text-center my-12"><h1 class="text-2xl font-black italic text-pink-200 tracking-tighter">Wishlist của Bòi Bói Boi🫃🏻</h1></div>
-            <div class="card-main p-8 mb-16">
-                <div class="space-y-6">
-                    <input type="text" id="giftName" placeholder="Tên món quà..." class="w-full p-4.5 rounded-2xl">
+            <div class="text-center my-10">
+                <h1 class="text-2xl font-black italic text-pink-200 uppercase">Wishlist của Bòi Bói Boi 🫃🏻</h1>
+                <p class="text-zinc-500 text-[10px] font-bold uppercase tracking-[0.15em] mt-2">Thêm món quà anh thích vào đây nhoéeee💌</p>
+            </div>
+            <div class="card-main p-8 mb-10 shadow-xl">
+                <div class="space-y-5">
+                    <input type="text" id="giftName" placeholder="Tên món quà mong muốn ..." class="w-full p-4.5 rounded-2xl">
                     <div class="grid grid-cols-2 gap-4">
-                        <select id="category" class="w-full p-4.5 rounded-2xl appearance-none">
-                            <option value="💕 Lãng Mạn">💕 Lãng Mạn</option>
-                            <option value="🎮 Công Nghệ">🎮 Công Nghệ</option>
-                            <option value="👕 Thời Trang">👕 Thời Trang</option>
-                        </select>
-                        <input type="text" id="giftPrice" placeholder="Giá..." class="w-full p-4.5 rounded-2xl font-bold">
+                        <div class="select-wrapper">
+                            <select id="category" class="w-full p-4.5 rounded-2xl appearance-none font-bold text-sm">
+                                <option value="💕 Lãng Mạn">💕 Lãng Mạn</option>
+                                <option value="🎮 Công Nghệ">🎮 Công Nghệ</option>
+                                <option value="👕 Thời Trang">👕 Thời Trang</option>
+                                <option value="⚽️ Thể thao">⚽️ Thể thao</option>
+                            </select>
+                        </div>
+                        <input type="text" id="giftPrice" placeholder="Giá tiền..." class="w-full p-4.5 rounded-2xl font-black text-pink-400">
                     </div>
                     <div class="grid grid-cols-1 gap-2">
-                        <button onclick="selectPriority(1)" id="priority-1" class="priority-btn gift-priority-btn p-3 rounded-xl active-priority">💬 FOMO</button>
-                        <button onclick="selectPriority(2)" id="priority-2" class="priority-btn gift-priority-btn p-3 rounded-xl">🌷 Thích nha</button>
-                        <button onclick="selectPriority(3)" id="priority-3" class="priority-btn gift-priority-btn p-3 rounded-xl">🙄 Muốn lắm</button>
-                        <button onclick="selectPriority(4)" id="priority-4" class="priority-btn gift-priority-btn p-3 rounded-xl">💕 Cần rồi</button>
-                        <button onclick="selectPriority(5)" id="priority-5" class="priority-btn gift-priority-btn p-3 rounded-xl text-red-500">🔥 PHẢI CÓ</button>
+                        <button onclick="selectPriority(1)" id="priority-1" class="priority-btn gift-priority-btn p-3 rounded-xl active-priority uppercase">💬 FOMO</button>
+                        <button onclick="selectPriority(2)" id="priority-2" class="priority-btn gift-priority-btn p-3 rounded-xl uppercase">🌷 Thích nha</button>
+                        <button onclick="selectPriority(3)" id="priority-3" class="priority-btn gift-priority-btn p-3 rounded-xl uppercase">🙄 Muốn lắm</button>
+                        <button onclick="selectPriority(4)" id="priority-4" class="priority-btn gift-priority-btn p-3 rounded-xl uppercase">💕 Cần rồi đó</button>
+                        <button onclick="selectPriority(5)" id="priority-5" class="priority-btn gift-priority-btn p-3 rounded-xl text-red-500 font-black uppercase">🔥 PHẢI CÓ LUÔN</button>
                     </div>
-                    <textarea id="giftNote" placeholder="Ghi chú..." class="w-full p-4.5 rounded-2xl h-24 resize-none"></textarea>
-                    <button onclick="addGift()" class="w-full py-5 bg-pink-600 text-white rounded-[2.5rem] font-black uppercase">🚀 THÊM QUÀ 💖</button>
+                    <textarea id="giftNote" placeholder="Ghi chú thêm..." class="w-full p-4.5 rounded-2xl h-24 resize-none text-sm"></textarea>
+                    <button onclick="addGift()" class="w-full py-5 bg-pink-600 text-white rounded-[2.5rem] font-black uppercase shadow-lg active:scale-95 transition-transform">
+                        🚀 Thêm vào Wishlist 💞
+                    </button>
                 </div>
             </div>
+            <div class="list-title">Danh sách ước mơ 🧚‍♀️</div>
             <div id="wishlistContainer" class="space-y-5"></div>
         </div>
+
+        <!-- FOODLIST -->
         <div id="tab-foods" class="hidden">
-            <div class="text-center my-12"><h1 class="text-2xl font-black italic text-orange-200 tracking-tighter">Foodlist Toàn Món Ngon🤤</h1></div>
-            <div class="card-main p-8 mb-16">
-                <div class="space-y-6">
-                    <div class="flex gap-4">
-                        <input type="text" id="foodName" placeholder="Tên món..." class="flex-1 p-4.5 rounded-2xl">
-                        <label class="w-20 h-[52px] bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center justify-center cursor-pointer overflow-hidden relative">
+            <div class="text-center my-10">
+                <h1 class="text-2xl font-black italic text-orange-200 uppercase">Foodlist Toàn Món Ngon 🤤</h1>
+                <p class="text-zinc-500 text-[10px] font-bold uppercase tracking-[0.15em] mt-2">Ăn cả thế giới cùng công chúa 🍕</p>
+            </div>
+            <div class="card-main p-8 mb-10 shadow-xl border-orange-900/20">
+                <div class="space-y-5">
+                    <div class="flex gap-3">
+                        <input type="text" id="foodName" placeholder="Tên món thèm ăn..." class="flex-1 p-4.5 rounded-2xl">
+                        <label class="w-16 h-[52px] bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center justify-center cursor-pointer overflow-hidden transition-all">
                             <i id="cameraIcon" class="fas fa-camera text-zinc-500"></i>
                             <img id="previewImg" class="w-full h-full object-cover hidden">
                             <input type="file" accept="image/*" onchange="handleImageUpload(event)" class="hidden">
                         </label>
                     </div>
                     <div class="grid grid-cols-2 gap-4">
-                        <select id="foodCategory" class="w-full p-4.5 rounded-2xl appearance-none">
-                            <option value="🥘 Món chính">🥘 Món chính</option>
-                            <option value="🍦 Đồ ngọt">🍦 Đồ ngọt</option>
-                        </select>
-                        <input type="text" id="foodPrice" placeholder="Giá..." class="w-full p-4.5 rounded-2xl font-bold">
+                        <div class="select-wrapper food-select">
+                            <select id="foodCategory" class="w-full p-4.5 rounded-2xl appearance-none font-bold text-sm">
+                                <option value="🥘 Món chính">🥘 Món chính</option>
+                                <option value="🍦 Đồ ngọt">🍦 Đồ ngọt</option>
+                                <option value="🥤 Đồ uống">🥤 Đồ uống</option>
+                                <option value="🍢 Ăn vặt">🍢 Ăn vặt</option>
+                            </select>
+                        </div>
+                        <input type="text" id="foodPrice" placeholder="Giá tham khảo..." class="w-full p-4.5 rounded-2xl font-black text-orange-400">
                     </div>
                     <div class="grid grid-cols-1 gap-2">
-                        <button onclick="selectFoodPriority(1)" id="food-priority-1" class="priority-btn food-priority-btn p-3 rounded-xl active-food-priority">🍜 Thử thôi</button>
-                        <button onclick="selectFoodPriority(2)" id="food-priority-2" class="priority-btn food-priority-btn p-3 rounded-xl">🍕 Khá thèm</button>
-                        <button onclick="selectFoodPriority(3)" id="food-priority-3" class="priority-btn food-priority-btn p-3 rounded-xl">🍔 Rất đói</button>
-                        <button onclick="selectFoodPriority(4)" id="food-priority-4" class="priority-btn food-priority-btn p-3 rounded-xl">🍣 Ghiền quá</button>
-                        <button onclick="selectFoodPriority(5)" id="food-priority-5" class="priority-btn food-priority-btn p-3 rounded-xl text-orange-500">🔥 THÈM CHẾT MẤT</button>
+                        <button onclick="selectFoodPriority(1)" id="food-priority-1" class="priority-btn food-priority-btn p-3 rounded-xl active-food-priority uppercase">🍜 Thử thôi</button>
+                        <button onclick="selectFoodPriority(2)" id="food-priority-2" class="priority-btn food-priority-btn p-3 rounded-xl uppercase">🍕 Khá thèm</button>
+                        <button onclick="selectFoodPriority(3)" id="food-priority-3" class="priority-btn food-priority-btn p-3 rounded-xl uppercase">🍔 Rất đói</button>
+                        <button onclick="selectFoodPriority(4)" id="food-priority-4" class="priority-btn food-priority-btn p-3 rounded-xl uppercase">🍣 Ghiền quá</button>
+                        <button onclick="selectFoodPriority(5)" id="food-priority-5" class="priority-btn food-priority-btn p-3 rounded-xl text-orange-500 font-black uppercase">🔥 THÈM CHẾT MẤT</button>
                     </div>
-                    <button onclick="addFood()" class="w-full py-5 bg-orange-500 text-white rounded-[2.5rem] font-black uppercase">🛒 CHỐT ĐƠN 🤪</button>
+                    <button onclick="addFood()" class="w-full py-5 bg-orange-500 text-white rounded-[2.5rem] font-black uppercase shadow-lg active:scale-95 transition-transform">
+                        🛒 CHỐT ĐƠN 🤪
+                    </button>
                 </div>
             </div>
+            <div class="list-title">Dự án nuôi eimmm🐖</div>
             <div id="foodListContainer" class="space-y-5"></div>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, push, onValue, remove, update, set, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-
-        const password = prompt("Nhập mật khẩu:");
-        if (password !== "congchuabuombuom") { alert("Sai rồi bưởi!"); window.location.href = "about:blank"; }
+        import { getDatabase, ref, push, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAiOpChueDkBODGKessbTvHDS-YOxeSsHE",
@@ -107,44 +134,27 @@
             projectId: "wishlist-c5669",
             storageBucket: "wishlist-c5669.firebasestorage.app",
             messagingSenderId: "821194575297",
-            appId: "1:821194575297:web:185b7837e6cdee4783f340",
-            measurementId: "G-RHE1QBW9WX"
+            appId: "1:821194575297:web:185b7837e6cdee4783f340"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        if (!localStorage.getItem('userRole')) { document.getElementById('roleOverlay').classList.remove('hidden'); }
+        if (localStorage.getItem('appAuth') !== "congchuabuombuom") {
+            const p = prompt("Nhập mật khẩu bí mật:");
+            if (p === "congchuabuombuom") localStorage.setItem('appAuth', p);
+            else window.location.href = "about:blank";
+        }
+
+        if (!localStorage.getItem('userRole')) document.getElementById('roleOverlay').classList.remove('hidden');
         window.setRole = (role) => { localStorage.setItem('userRole', role); location.reload(); };
         const currentUser = localStorage.getItem('userRole');
-
-        // Logic Badge theo yêu cầu cụ thể:
-        // Em chỉ nhận badge khi Anh add Quà. Anh chỉ nhận badge khi Em add Đồ ăn.
-        const badgeRef = ref(db, currentUser === 'em' ? 'badgeForWish' : 'badgeForFood');
-        onValue(badgeRef, (s) => {
-            const count = s.val() || 0;
-            if ('setAppBadge' in navigator) { count > 0 ? navigator.setAppBadge(count) : navigator.clearAppBadge(); }
-        });
-
-        const notifyPartner = async (type) => {
-            let targetNode = "";
-            // Nếu Anh (role='anh') add Quà (type='wish') -> Thông báo cho Em qua node badgeForWish
-            if (currentUser === 'anh' && type === 'wish') targetNode = 'badgeForWish';
-            // Nếu Em (role='em') add Đồ ăn (type='food') -> Thông báo cho Anh qua node badgeForFood
-            if (currentUser === 'em' && type === 'food') targetNode = 'badgeForFood';
-
-            if (targetNode) {
-                const r = ref(db, targetNode);
-                const s = await get(r);
-                set(r, (s.val() || 0) + 1);
-            }
-        };
 
         const wishlistRef = ref(db, 'gifts'), foodRef = ref(db, 'foods');
         let selPrio = 1, foodPrio = 1, imgB64 = "";
 
         const burst = () => {
-            const icons = ['🎁', '💃', '✨', '💖', '💍', '🧸', '🍜', '🍕', '🍣', '🍔'];
+            const icons = ['🎁', '✨', '💖', '💍', '🍜', '🍕', '🍣', '🍔'];
             for (let i = 0; i < 20; i++) {
                 const b = document.createElement('div');
                 b.className = 'gift-box'; b.innerText = icons[Math.floor(Math.random()*icons.length)];
@@ -153,73 +163,83 @@
             }
         };
 
-        const scroll = (id, isFood) => {
-            burst();
-            setTimeout(() => {
-                const el = document.getElementById(`item-${id}`);
-                if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.style.boxShadow = isFood ? "0 0 30px #f59e0b" : "0 0 30px #f472b6"; setTimeout(() => el.style.boxShadow = "none", 2000); }
-            }, 500);
-        };
-
         window.addGift = () => {
             const n = document.getElementById('giftName').value, p = document.getElementById('giftPrice').value;
-            if(!n || !p) return alert("Nhập đủ tên và giá!");
-            const res = push(wishlistRef, { name: n, price: p, category: document.getElementById('category').value, note: document.getElementById('giftNote').value, priority: selPrio, status: 'pending', createdAt: Date.now() });
-            notifyPartner('wish');
-            document.getElementById('giftName').value = ""; document.getElementById('giftPrice').value = ""; scroll(res.key, false);
+            if(!n || !p) return alert("Nhập đủ Tên và Giá nha!");
+            push(wishlistRef, { name: n, price: p, category: document.getElementById('category').value, note: document.getElementById('giftNote').value, priority: selPrio, status: 'pending', addedBy: currentUser, createdAt: Date.now() });
+            document.getElementById('giftName').value = ""; document.getElementById('giftPrice').value = ""; document.getElementById('giftNote').value = "";
+            burst();
         };
 
         window.addFood = () => {
             const n = document.getElementById('foodName').value, p = document.getElementById('foodPrice').value;
-            if(!n || !p) return alert("Nhập đủ món và giá!");
-            const res = push(foodRef, { name: n, price: p, category: document.getElementById('foodCategory').value, image: imgB64, priority: foodPrio, status: 'pending', createdAt: Date.now() });
-            notifyPartner('food');
-            document.getElementById('foodName').value = ""; document.getElementById('foodPrice').value = ""; imgB64 = ""; scroll(res.key, true);
+            if(!n || !p) return alert("Món này tên gì và giá bao nhiêu nhỉ?");
+            push(foodRef, { name: n, price: p, category: document.getElementById('foodCategory').value, image: imgB64, priority: foodPrio, status: 'pending', addedBy: currentUser, createdAt: Date.now() });
+            document.getElementById('foodName').value = ""; document.getElementById('foodPrice').value = ""; imgB64 = "";
+            document.getElementById('previewImg').classList.add('hidden'); document.getElementById('cameraIcon').classList.remove('hidden');
+            burst();
         };
 
-        const render = (r, cId, lbls, sFn, dFn, isF) => {
-            onValue(r, (snap) => {
-                const cont = document.getElementById(cId); cont.innerHTML = "";
+        const render = (refSrc, contId, labels, stFn, delFn, isF) => {
+            onValue(refSrc, (snap) => {
+                const cont = document.getElementById(contId);
+                cont.innerHTML = "";
                 const data = snap.val();
                 if(data) {
-                    Object.keys(data).map(k => ({id:k, ...data[k]})).sort((a,b) => b.priority - a.priority || b.createdAt - a.createdAt).forEach(item => {
-                        const isB = item.status === 'bought';
-                        const styles = isF ? ["", "bg-zinc-600", "bg-emerald-500", "bg-amber-500", "bg-orange-500", "bg-red-600"] : ["", "bg-zinc-600", "bg-emerald-500", "bg-pink-400", "bg-pink-600", "bg-red-600"];
-                        cont.insertAdjacentHTML('beforeend', `<div id="item-${item.id}" class="p-6 mb-5 rounded-[2.5rem] border border-zinc-800 bg-[#0d0d0d] ${isB ? 'opacity-30 grayscale' : ''}"><div class="flex justify-between items-start"><div class="flex-1 pr-3"><span class="text-[9px] px-2.5 py-1 rounded-full font-black uppercase text-white ${styles[item.priority]}">${lbls[item.priority]}</span><h3 class="font-bold text-xl mt-3 ${isB ? 'line-through' : ''}">${item.name}</h3><p class="text-[11px] text-zinc-500 font-bold mt-1">${item.price}đ • ${item.category}</p>${item.image ? `<img src="${item.image}" class="mt-4 rounded-3xl w-full h-48 object-cover border border-zinc-800">` : ''}</div><div class="flex flex-col gap-4"><button onclick="${sFn}('${item.id}', '${isB ? 'pending' : 'bought'}')" class="w-14 h-14 bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center justify-center text-2xl">${isF ? '🤤' : '💃'}</button><button onclick="${dFn}('${item.id}')" class="w-14 h-14 bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center justify-center text-2xl">🗑️</button></div></div></div>`);
+                    Object.keys(data).map(k => ({id:k, ...data[k]}))
+                    .sort((a,b) => b.priority - a.priority || b.createdAt - a.createdAt)
+                    .forEach(item => {
+                        const isD = item.status === 'bought';
+                        const pC = isF ? ["", "bg-zinc-600", "bg-emerald-500", "bg-amber-500", "bg-orange-500", "bg-red-600"] : ["", "bg-zinc-600", "bg-emerald-500", "bg-pink-400", "bg-pink-600", "bg-red-600"];
+                        const poster = item.addedBy === 'em' ? "Công Chúa 👑" : "Bòi Bói Boi 🫃🏻";
+                        cont.insertAdjacentHTML('beforeend', `
+                            <div class="p-6 mb-5 rounded-[2.5rem] border border-zinc-800 bg-[#0d0d0d] relative ${isD ? 'opacity-30 grayscale' : ''}">
+                                <div class="flex justify-between items-start">
+                                    <div class="flex-1 pr-4">
+                                        <div class="flex items-center gap-2 mb-3">
+                                            <span class="text-[8px] px-2.5 py-1 rounded-full font-black uppercase text-white ${pC[item.priority]}">${labels[item.priority]}</span>
+                                            <span class="text-[9px] text-zinc-600 font-bold uppercase tracking-widest">${item.category}</span>
+                                        </div>
+                                        <h3 class="font-bold text-xl ${isD ? 'line-through' : ''}">${item.name}</h3>
+                                        <div class="flex items-center gap-3 mt-1">
+                                            <p class="text-lg font-black ${isF ? 'text-orange-400' : 'text-pink-400'}">${item.price}đ</p>
+                                            <span class="text-[9px] text-zinc-800 font-bold italic">By: ${poster}</span>
+                                        </div>
+                                        ${item.note ? `<div class="mt-4 text-xs text-zinc-400 bg-zinc-950 p-4 rounded-2xl border border-zinc-900">${item.note}</div>` : ''}
+                                        ${item.image ? `<img src="${item.image}" class="mt-4 rounded-3xl w-full h-52 object-cover border border-zinc-800">` : ''}
+                                    </div>
+                                    <div class="flex flex-col gap-3">
+                                        <button onclick="${stFn}('${item.id}', '${isD ? 'pending' : 'bought'}')" class="w-14 h-14 bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center justify-center text-2xl active:scale-90 transition-all">${isF ? (isD ? '✅' : '🤤') : (isD ? '📦' : '💃')}</button>
+                                        <button onclick="${delFn}('${item.id}')" class="w-14 h-14 bg-zinc-950 border border-zinc-900 rounded-2xl flex items-center justify-center text-2xl active:scale-90 transition-all opacity-60">🗑️</button>
+                                    </div>
+                                </div>
+                            </div>
+                        `);
                     });
                 }
             });
         };
 
-        render(wishlistRef, 'wishlistContainer', ["", "💬 FOMO", "🌷 Thích nha", "🙄 Muốn lắm", "💕 Cần rồi", "🔥 PHẢI CÓ"], 'updS', 'delI', false);
-        render(foodRef, 'foodListContainer', ["", "🍜 Thử thôi", "🍕 Khá thèm", "🍔 Rất đói", "🍣 Ghiền quá", "🔥 CHẾT MẤT"], 'updFS', 'delFI', true);
+        render(wishlistRef, 'wishlistContainer', ["", "💬 FOMO", "🌷 Thích nha", "🙄 Muốn lắm", "💕 Cần rồi", "🔥 PHẢI CÓ"], 'upGS', 'delGS', false);
+        render(foodRef, 'foodListContainer', ["", "🍜 Thử thôi", "🍕 Khá thèm", "🍔 Rất đói", "🍣 Ghiền quá", "🔥 THÈM CHẾT MẤT"], 'upFS', 'delFS', true);
 
-        window.delI = (id) => confirm("Xoá quà?") && remove(ref(db, `gifts/${id}`));
-        window.updS = (id, s) => update(ref(db, `gifts/${id}`), {status: s});
-        window.delFI = (id) => confirm("Xoá món?") && remove(ref(db, `foods/${id}`));
-        window.updFS = (id, s) => update(ref(db, `foods/${id}`), {status: s});
+        window.delGS = (id) => confirm("Xoá món quà này nhé?") && remove(ref(db, `gifts/${id}`));
+        window.upGS = (id, s) => update(ref(db, `gifts/${id}`), {status: s});
+        window.delFS = (id) => confirm("Xoá món ăn này nhé?") && remove(ref(db, `foods/${id}`));
+        window.upFS = (id, s) => update(ref(db, `foods/${id}`), {status: s});
         window.selectPriority = (v) => { selPrio = v; document.querySelectorAll('.gift-priority-btn').forEach(b => b.classList.remove('active-priority')); document.getElementById('priority-' + v).classList.add('active-priority'); };
         window.selectFoodPriority = (v) => { foodPrio = v; document.querySelectorAll('.food-priority-btn').forEach(b => b.classList.remove('active-food-priority')); document.getElementById('food-priority-' + v).classList.add('active-food-priority'); };
         window.handleImageUpload = (e) => { const f = e.target.files[0]; if(f){ const r = new FileReader(); r.onload = (ev) => { imgB64 = ev.target.result; document.getElementById('previewImg').src = imgB64; document.getElementById('previewImg').classList.remove('hidden'); document.getElementById('cameraIcon').classList.add('hidden'); }; r.readAsDataURL(f); } };
-        
         window.switchTab = (tab) => {
-            const g = document.getElementById('tab-gifts'), f = document.getElementById('tab-foods'), bg = document.getElementById('btn-tab-gift'), bf = document.getElementById('btn-tab-food');
-            if(tab === 'gifts') { 
-                g.classList.remove('hidden'); f.classList.add('hidden'); 
-                bg.className = "flex-1 py-4 rounded-[2rem] font-black text-[10px] uppercase bg-pink-600 text-white shadow-lg"; 
-                bf.className = "flex-1 py-4 rounded-[2rem] font-black text-[10px] uppercase bg-zinc-900 text-zinc-500"; 
-                if(currentUser === 'em') set(ref(db, 'badgeForWish'), 0); // Em vào xem quà thì reset badge quà của mình
-            }
-            else { 
-                g.classList.add('hidden'); f.classList.remove('hidden'); 
-                bf.className = "flex-1 py-4 rounded-[2rem] font-black text-[10px] uppercase bg-orange-500 text-white shadow-lg"; 
-                bg.className = "flex-1 py-4 rounded-[2rem] font-black text-[10px] uppercase bg-zinc-900 text-zinc-500"; 
-                if(currentUser === 'anh') set(ref(db, 'badgeForFood'), 0); // Anh vào xem đồ ăn thì reset badge đồ ăn của mình
-            }
+            const gD = document.getElementById('tab-gifts'), fD = document.getElementById('tab-foods'), gB = document.getElementById('btn-tab-gift'), fB = document.getElementById('btn-tab-food');
+            if(tab === 'gifts') { gD.classList.remove('hidden'); fD.classList.add('hidden'); gB.className = "flex-1 py-4 rounded-[2rem] font-black text-[10px] uppercase bg-pink-600 text-white shadow-lg"; fB.className = "flex-1 py-4 rounded-[2rem] font-black text-[10px] uppercase bg-zinc-900 text-zinc-500"; }
+            else { gD.classList.add('hidden'); fD.classList.remove('hidden'); fB.className = "flex-1 py-4 rounded-[2rem] font-black text-[10px] uppercase bg-orange-500 text-white shadow-lg"; gB.className = "flex-1 py-4 rounded-[2rem] font-black text-[10px] uppercase bg-zinc-900 text-zinc-500"; }
         };
-        const fM = (id) => { const el = document.getElementById(id); if(el) el.addEventListener('input', (e) => { let v = e.target.value.replace(/\D/g, ""); e.target.value = new Intl.NumberFormat('en-US').format(v); }); };
-        fM('giftPrice'); fM('foodPrice');
+        const format = (id) => { const el = document.getElementById(id); if(el) el.addEventListener('input', (e) => { let v = e.target.value.replace(/\D/g, ""); if (v) e.target.value = new Intl.NumberFormat('en-US').format(v); }); };
+        format('giftPrice'); format('foodPrice');
     </script>
 </body>
 </html>
+
+```
 
