@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Wishlist & Foodlist Masterpiece</title>
+    <script>(function(w,d, s, id) {if(w.webpushr) return;w.webpushr=w.webpushr||function(){(w.webpushr.q=w.webpushr.q||[]).push(arguments)};var js, fjs = d.getElementsByTagName(s)[0];js = d.createElement(s); js.id = id;js.async=1;js.src = "https://cdn.webpushr.com/app.js";fjs.parentNode.insertBefore(js, fjs);}(window,document, 'script', 'webpushr-jssdk'));webpushr('init','BPaLz_7z7U-pW8P7V5V3_v9z5Y0');</script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -146,25 +147,52 @@
         };
 
         window.add = (path) => {
-            const pre = path === 'gifts' ? 'gift' : 'food';
-            const nameEl = document.getElementById(pre+'Name');
-            const priceEl = document.getElementById(pre+'Price');
-            if(!nameEl.value || !priceEl.value) return;
-            const payload = {
-                name: nameEl.value, price: priceEl.value,
-                category: document.getElementById(path === 'gifts' ? 'category' : 'foodCategory').value,
-                priority: path === 'gifts' ? selPrio : foodPrio,
-                note: path === 'gifts' ? document.getElementById('giftNote').value : "",
-                image: path === 'foods' ? imgB64 : "",
-                status: 'pending', addedBy: currentUser, createdAt: Date.now()
-            };
-            const newRef = push(ref(db, path));
-            seenIds.push(newRef.key); localStorage.setItem('seen_v_f_v3', JSON.stringify(seenIds));
-            update(newRef, payload); burst(); shootEmoji();
-            nameEl.value = ""; priceEl.value = "";
-            if(path==='foods') { document.getElementById('fPrev').classList.add('hidden'); document.getElementById('camIcon').classList.remove('hidden'); imgB64 = ""; }
-            else { document.getElementById('giftNote').value = ""; }
-        };
+    const pre = path === 'gifts' ? 'gift' : 'food';
+    const nameEl = document.getElementById(pre+'Name');
+    const priceEl = document.getElementById(pre+'Price');
+    if(!nameEl.value || !priceEl.value) return;
+    const payload = {
+        name: nameEl.value, price: priceEl.value,
+        category: document.getElementById(path === 'gifts' ? 'category' : 'foodCategory').value,
+        priority: path === 'gifts' ? selPrio : foodPrio,
+        note: path === 'gifts' ? document.getElementById('giftNote').value : "",
+        image: path === 'foods' ? imgB64 : "",
+        status: 'pending', addedBy: currentUser, createdAt: Date.now()
+    };
+    const newRef = push(ref(db, path));
+    
+    // Gửi lên Firebase và xử lý sau khi thành công
+    update(newRef, payload).then(() => {
+        // Tự động cuộn xuống món mới
+        setTimeout(() => {
+            const el = document.getElementById('card-' + newRef.key);
+            if(el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 500);
+
+        // Bắn thông báo Push cho đối phương
+        fetch('https://api.webpushr.com/v1/notification/send/all', {
+            method: 'POST',
+            headers: {
+                'webpushrKey': '19349c256722874138e64736f863261b',
+                'webpushrAuth': '55122',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                "title": currentUser === 'em' ? "👸 Công Chúa nhắn nè:" : "🤴 Bòi Bói Boi nhắn:",
+                "message": `Món mới: ${nameEl.value}. Vào check nợ đi!`,
+                "target_url": window.location.href
+            })
+        }).catch(e => console.log(e));
+    });
+
+    seenIds.push(newRef.key); 
+    localStorage.setItem('seen_v_f_v3', JSON.stringify(seenIds));
+    burst(); shootEmoji();
+    nameEl.value = ""; priceEl.value = "";
+    if(path==='foods') { document.getElementById('fPrev').classList.add('hidden'); document.getElementById('camIcon').classList.remove('hidden'); imgB64 = ""; }
+    else { document.getElementById('giftNote').value = ""; }
+};
+
 
         window.toggleStatus = (path, id, curr, event) => {
             const ns = curr === 'bought' ? 'pending' : 'bought';
@@ -184,41 +212,40 @@
         };
 
         const listen = (path, contId) => {
-            onValue(ref(db, path), (snap) => {
-                const data = snap.val() || {};
-                const list = Object.keys(data).map(k => ({id:k, ...data[k]}))
-                    .sort((a,b) => {
-                        if(a.status !== b.status) return a.status === 'pending' ? -1 : 1;
-                        if(a.priority !== b.priority) return b.priority - a.priority;
-                        return b.createdAt - a.createdAt;
-                    });
-                refreshBadges();
-                document.getElementById(contId).innerHTML = list.map(item => {
-                    const isD = item.status === 'bought';
-                    const label = priorityLabels[path][item.priority];
-                    return `
-                    <div id="${item.id}" onclick="markSeen('${item.id}')" class="p-6 rounded-[2.5rem] border border-zinc-900 bg-[#0d0d0d] relative transition-all duration-500 ${isD ? 'bought-item' : ''}">
-                        ${!seenIds.includes(item.id) ? '<div class="new-dot"></div>' : ''}
-                        <div class="flex justify-between items-start">
-                            <div class="flex-1 pr-4">
-                                <div class="flex items-center gap-2 mb-2">
-                                    <span class="text-[8px] px-2 py-0.5 rounded-full font-black uppercase text-white active-p-${item.priority}">${label}</span>
-                                    <span class="text-[8px] text-zinc-600 font-bold uppercase tracking-widest">${item.category}</span>
-                                </div>
-                                <h3 class="font-bold text-lg leading-tight mb-1">${item.name}</h3>
-                                <p class="font-black text-xl ${path==='gifts'?'text-pink-400':'text-orange-400'}">${item.price}đ</p>
-                                ${item.note ? `<p class="text-xs text-zinc-500 italic mt-3 bg-white/5 p-3 rounded-2xl border border-white/5">"${item.note}"</p>` : ''}
-                                ${item.image ? `<img src="${item.image}" class="mt-4 rounded-[2rem] w-full h-52 object-cover border border-zinc-900 shadow-lg">` : ''}
-                            </div>
-                            <div class="flex flex-col gap-2">
-                                <button onclick="event.stopPropagation(); toggleStatus('${path}', '${item.id}', '${item.status}', event)" class="w-12 h-12 bg-zinc-900 rounded-2xl flex items-center justify-center text-lg active:scale-90 transition-all border border-zinc-800">${isD ? '🔄' : (path==='gifts'?'💖':'😋')}</button>
-                                <button onclick="event.stopPropagation(); confirm('Xóa nha?') && remove(ref(db, '${path}/${item.id}'))" class="w-12 h-12 bg-zinc-950 rounded-2xl flex items-center justify-center text-zinc-800 active:text-red-500 transition-colors"><i class="fas fa-trash text-xs"></i></button>
-                            </div>
-                        </div>
-                    </div>`;
-                }).join('');
+    onValue(ref(db, path), (snap) => {
+        const data = snap.val() || {};
+        const list = Object.keys(data).map(k => ({id:k, ...data[k]}))
+            .sort((a,b) => {
+                if(a.status !== b.status) return a.status === 'pending' ? -1 : 1;
+                return b.createdAt - a.createdAt;
             });
-        };
+        
+        refreshBadges();
+        document.getElementById(contId).innerHTML = list.map(item => {
+            const isD = item.status === 'bought';
+            const label = priorityLabels[path][item.priority];
+            // PHẢI CÓ id="card-${item.id}" thì lệnh cuộn mới hoạt động
+            return `
+            <div id="card-${item.id}" onclick="markSeen('${item.id}')" class="p-6 rounded-[2.5rem] border border-zinc-900 bg-[#0d0d0d] relative transition-all duration-500 ${isD ? 'bought-item' : ''}">
+                ${!seenIds.includes(item.id) ? '<div class="new-dot"></div>' : ''}
+                <div class="flex justify-between items-start">
+                    <div class="flex-1 pr-4">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="text-[8px] px-2 py-0.5 rounded-full font-black uppercase text-white active-p-${item.priority}">${label}</span>
+                            <span class="text-[8px] text-zinc-600 font-bold uppercase tracking-widest">${item.category}</span>
+                        </div>
+                        <h3 class="font-bold text-lg mb-1">${item.name}</h3>
+                        <p class="font-black text-xl ${path==='gifts'?'text-pink-400':'text-orange-400'}">${item.price}đ</p>
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <button onclick="event.stopPropagation(); toggleStatus('${path}', '${item.id}', '${item.status}', event)" class="w-12 h-12 bg-zinc-900 rounded-2xl flex items-center justify-center">${isD ? '🔄' : (path==='gifts'?'💖':'😋')}</button>
+                        <button onclick="event.stopPropagation(); if(confirm('Xóa nha?')) remove(ref(db, '${path}/${item.id}'))" class="w-12 h-12 bg-zinc-950 rounded-2xl flex items-center justify-center text-zinc-800"><i class="fas fa-trash text-xs"></i></button>
+                    </div>
+                </div>
+            </div>`;
+        }).join('');
+    });
+};
 
         window.selP = (v) => { selPrio = v; document.querySelectorAll('.gift-p').forEach(b => b.classList.remove('active-p-1','active-p-2','active-p-3','active-p-4','active-p-5')); document.getElementById('p-'+v).classList.add('active-p-'+v); };
         window.selFP = (v) => { foodPrio = v; document.querySelectorAll('.food-p').forEach(b => b.classList.remove('active-p-1','active-p-2','active-p-3','active-p-4','active-p-5')); document.getElementById('fp-'+v).classList.add('active-p-'+v); };
