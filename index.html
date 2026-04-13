@@ -30,36 +30,27 @@ if (password !== "congchuabuombuom") { // Thay 123456 bằng pass của mày
 
         const app = initializeApp(firebaseConfig);
         
-const badgeRef = ref(database, 'sharedBadgeCount');
-
-// Máy của cả 2 luôn lắng nghe số này trên mạng
-onValue(badgeRef, (snapshot) => {
-    const count = snapshot.val() || 0;
-    if ('setAppBadge' in navigator) {
-        if (count > 0) {
-            navigator.setAppBadge(count);
-        } else {
-            navigator.clearAppBadge();
-        }
-    }
-});
-
-// Hàm để báo cho máy kia biết có món mới
-const notifyPartner = async () => {
-    const snapshot = await get(badgeRef);
-    const current = snapshot.val() || 0;
-    set(badgeRef, current + 1);
-};
-
-// Hàm xóa số đỏ khi đã xem xong
-window.resetBadge = () => {
-    set(badgeRef, 0);
-};
-
-// Vừa mở app là xóa số đỏ cho cả 2 máy luôn
-window.resetBadge();
-
+        const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
+
+        const badgeRef = ref(db, 'sharedBadgeCount');
+
+        onValue(badgeRef, (snapshot) => {
+            const count = snapshot.val() || 0;
+            if ('setAppBadge' in navigator) {
+                if (count > 0) navigator.setAppBadge(count);
+                else navigator.clearAppBadge();
+            }
+        });
+
+        const notifyPartner = async () => {
+            const snapshot = await get(badgeRef);
+            set(badgeRef, (snapshot.val() || 0) + 1);
+        };
+
+        window.resetBadge = () => set(badgeRef, 0);
+        window.resetBadge();
+
         const wishlistRef = ref(db, 'gifts');
         const foodRef = ref(db, 'foods');
 
@@ -69,13 +60,13 @@ window.resetBadge();
 
         const getPriorityStyle = (priority, isFood) => {
             if(isFood) {
-        switch (priority) {
-            case 5: return 'bg-violet-600 text-white';
-            case 4: return 'bg-fuchsia-500 text-white';
-            case 3: return 'bg-cyan-400 text-black';
-            case 2: return 'bg-emerald-400 text-black';
-            default: return 'bg-slate-500 text-white';
-        }
+                switch (priority) {
+                    case 5: return 'bg-violet-600 text-white';
+                    case 4: return 'bg-fuchsia-500 text-white';
+                    case 3: return 'bg-cyan-400 text-black';
+                    case 2: return 'bg-emerald-400 text-black';
+                    default: return 'bg-slate-500 text-white';
+                }
             }
             switch (priority) {
                 case 5: return 'bg-red-600 text-white shadow-[0_0_10px_rgba(220,38,38,0.4)]';
@@ -122,90 +113,64 @@ window.resetBadge();
                 reader.readAsDataURL(file);
             }
         };
-const scrollToNewItem = (itemId, isFoodTab) => {
-    setTimeout(() => {
-        const newItem = document.getElementById(`item-${itemId}`);
-        if (newItem) {
-            newItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            newItem.style.transition = "all 0.8s ease";
-            newItem.style.boxShadow = isFoodTab ? "0 0 40px #f59e0b" : "0 0 40px #f472b6";
-            setTimeout(() => { newItem.style.boxShadow = "none"; }, 2000);
-        }
-    }, 600);
-};
+
+        const scrollToNewItem = (itemId, isFoodTab) => {
+            setTimeout(() => {
+                const newItem = document.getElementById(`item-${itemId}`);
+                if (newItem) {
+                    newItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    newItem.style.transition = "all 0.8s ease";
+                    newItem.style.boxShadow = isFoodTab ? "0 0 40px #f59e0b" : "0 0 40px #f472b6";
+                    setTimeout(() => { newItem.style.boxShadow = "none"; }, 2000);
+                }
+            }, 600);
+        };
 
         window.addGift = (btn) => {
-    const name = document.getElementById('giftName').value;
-    const price = document.getElementById('giftPrice').value;
-    const category = document.getElementById('category').value;
-    const note = document.getElementById('giftNote').value;
+            const name = document.getElementById('giftName').value;
+            const price = document.getElementById('giftPrice').value;
+            const category = document.getElementById('category').value;
+            const note = document.getElementById('giftNote').value;
+            if (!name || !price) return alert("Nhập đủ tên và giá!");
+            const newRef = push(wishlistRef, {
+                name: name, price: price, category: category, note: note,
+                priority: selectedPriority, status: 'pending', createdAt: Date.now()
+            });
+            triggerGiftBurst();
+            document.getElementById('giftName').value = "";
+            document.getElementById('giftPrice').value = "";
+            document.getElementById('giftNote').value = "";
+            document.getElementById('category').selectedIndex = 0;
+            selectedPriority = 1; 
+            document.querySelectorAll('.gift-priority-btn').forEach(btn => btn.classList.remove('active-priority'));
+            document.getElementById('priority-1').classList.add('active-priority');
+            scrollToNewItem(newRef.key, false); 
+            notifyPartner();
+        };
 
-    if (!name || !price) return alert("Nhập đủ tên và giá!");
+        window.addFood = (btn) => {
+            const name = document.getElementById('foodName').value;
+            const price = document.getElementById('foodPrice').value;
+            const category = document.getElementById('foodCategory').value;
+            if (!name || !price) return alert("Nhập đủ món và giá!");
+            const newRef = push(foodRef, {
+                name: name, price: price, category: category, image: foodImageBase64,
+                priority: foodPriority, status: 'pending', createdAt: Date.now()
+            });
+            triggerGiftBurst();
+            document.getElementById('foodName').value = "";
+            document.getElementById('foodPrice').value = "";
+            document.getElementById('foodCategory').selectedIndex = 0;
+            document.getElementById('previewImg').classList.add('hidden');
+            document.getElementById('cameraIcon').classList.remove('hidden');
+            foodImageBase64 = ""; 
+            foodPriority = 1;
+            document.querySelectorAll('.food-priority-btn').forEach(btn => btn.classList.remove('active-food-priority'));
+            document.getElementById('food-priority-1').classList.add('active-food-priority');
+            scrollToNewItem(newRef.key, true); 
+            notifyPartner();
+        };
 
-    const newRef = push(wishlistRef, {
-        name: name,
-        price: price,
-        category: category,
-        note: note,
-        priority: selectedPriority,
-        status: 'pending',
-        createdAt: Date.now()
-    });
-
-    triggerGiftBurst();
-        // Dọn dẹp sạch sẽ form Wishlist
-    document.getElementById('giftName').value = "";
-    document.getElementById('giftPrice').value = "";
-    document.getElementById('giftNote').value = "";
-    document.getElementById('category').selectedIndex = 0;
-    
-    // Đưa độ ưu tiên về mức 1 (màu hồng)
-    selectedPriority = 1; 
-    document.querySelectorAll('.gift-priority-btn').forEach(btn => btn.classList.remove('active-priority'));
-    document.getElementById('priority-1').classList.add('active-priority');
-
-    scrollToNewItem(newRef.key, false); 
-                notifyPartner();
-
-};
-
-window.addFood = (btn) => {
-    const name = document.getElementById('foodName').value;
-    const price = document.getElementById('foodPrice').value;
-    const category = document.getElementById('foodCategory').value; // Lấy loại đồ ăn
-
-    if (!name || !price) return alert("Nhập đủ món và giá!");
-
-    const newRef = push(foodRef, {
-        name: name,
-        price: price,
-        category: category,
-        image: foodImageBase64,
-        priority: foodPriority,
-        status: 'pending',
-        createdAt: Date.now()
-    });
-
-    triggerGiftBurst();
-        // Dọn dẹp sạch sẽ form Foodlist
-    document.getElementById('foodName').value = "";
-    document.getElementById('foodPrice').value = "";
-    document.getElementById('foodCategory').selectedIndex = 0;
-    
-    // Xóa ảnh cũ
-    document.getElementById('previewImg').classList.add('hidden');
-    document.getElementById('cameraIcon').classList.remove('hidden');
-    foodImageBase64 = ""; 
-
-    // Đưa độ thèm về mức 1 (màu cam)
-    foodPriority = 1;
-    document.querySelectorAll('.food-priority-btn').forEach(btn => btn.classList.remove('active-food-priority'));
-    document.getElementById('food-priority-1').classList.add('active-food-priority');
-
-    scrollToNewItem(newRef.key, true); 
-    notifyPartner();
-
-};
 
 onValue(wishlistRef, (snapshot) => {
     const container = document.getElementById('wishlistContainer');
