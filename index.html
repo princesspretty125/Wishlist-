@@ -38,6 +38,9 @@
         .sub-title { font-size: 11px; font-weight: 600; font-style: italic; opacity: 0.8; letter-spacing: 0.02em; margin-top: 6px; display: block; line-height: 1.4; }
         .item-highlight { animation: highlight 2s ease-out; }
         @keyframes highlight { 0% { background: #333; } 100% { background: #0d0d0d; } }
+        .winner-highlight { border-color: #f97316 !important; box-shadow: 0 0 25px rgba(249, 115, 22, 0.6); transform: scale(1.02); z-index: 10; transition: all 0.2s; }
+.flash-winner { animation: flashAnim 0.5s infinite; }
+@keyframes flashAnim { 0%, 100% { background-color: #0d0d0d; } 50% { background-color: #1a1a1a; border-color: #fb923c !important; } }
     </style>
 </head>
 <body class="flex justify-center min-h-screen p-4 pb-24">
@@ -136,7 +139,11 @@
             const pre = path === 'gifts' ? 'gift' : 'food';
             const nameEl = document.getElementById(pre+'Name');
             const priceEl = document.getElementById(pre+'Price');
-            if(!nameEl.value || !priceEl.value) return;
+            if (!nameEl.value.trim() || !priceEl.value.trim()) {
+    alert("Vui lòng nhập đầy đủ tên và giá nhé!");
+    return;
+}
+
             const payload = {
                 name: nameEl.value, price: priceEl.value,
                 category: document.getElementById(path === 'gifts' ? 'category' : 'foodCategory').value,
@@ -239,6 +246,28 @@
         const format = (id) => { document.getElementById(id).addEventListener('input', (e) => { let v = e.target.value.replace(/\D/g, ""); if (v) e.target.value = new Intl.NumberFormat().format(v); }); };
         format('giftPrice'); format('foodPrice');
         listen('gifts', 'wishlistContainer'); listen('foods', 'foodListContainer');
+        window.pickRandomFood = () => {
+    const items = document.querySelectorAll('#foodListContainer > div:not(.bought-item)');
+    if (items.length === 0) return;
+    let count = 0, totalFlips = 25, speed = 60;
+    const startSpin = () => {
+        items.forEach(el => { el.classList.remove('winner-highlight', 'flash-winner'); el.style.borderColor = '#1a1a1a'; });
+        const currentEl = items[Math.floor(Math.random() * items.length)];
+        currentEl.style.borderColor = '#f97316';
+        currentEl.style.backgroundColor = '#1a1a1a';
+        count++;
+        if (count < totalFlips) {
+            if (count > 15) speed += 30;
+            setTimeout(startSpin, speed);
+        } else {
+            currentEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            currentEl.classList.add('winner-highlight', 'flash-winner');
+            setTimeout(() => { currentEl.classList.remove('flash-winner'); currentEl.style.backgroundColor = '#0d0d0d'; }, 3000);
+        }
+    };
+    startSpin();
+};
+
     </script>
 
     <div class="w-full max-w-md">
@@ -291,6 +320,12 @@
                 <h1 class="text-2xl font-black italic text-orange-500 uppercase leading-tight">Foodlist toàn món ngonnn 🤤</h1>
                 <span class="sub-title text-orange-400">Anh ơi em đói em mún ăn cái nàyyyyy 🥺</span>
             </div>
+            <div id="random-picker-area" class="mb-6 px-4">
+    <button onclick="pickRandomFood()" class="w-full py-4 bg-gradient-to-r from-orange-600 to-orange-400 rounded-2xl font-black uppercase text-[11px] tracking-widest shadow-[0_10px_20px_rgba(234,88,12,0.3)] active:scale-95 transition-all">
+        🎲 KHÔNG BIẾT ĂN GÌ? QUAY ĐI! 🎲
+    </button>
+</div>
+
             <div class="card-main p-8 mb-10 shadow-xl">
                 <div class="space-y-5">
                     <div class="flex gap-3">
